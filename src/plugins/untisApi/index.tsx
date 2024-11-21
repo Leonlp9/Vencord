@@ -175,6 +175,7 @@ const UntisAPIPlugin: React.FC = () => {
             settings.store.UntisType || "defaultType"
         );
         setIsOpen(!isOpen);
+        await webUntis.setUp();
 
 
 

@@ -5,7 +5,7 @@
  */
 
 import { addChatBarButton, ChatBarButton, removeChatBarButton } from "@api/ChatButtons";
-import { addPreSendListener, removePreSendListener } from "@api/MessageEvents";
+import { addMessagePreSendListener, removeMessagePreSendListener } from "@api/MessageEvents";
 import { definePluginSettings } from "@api/Settings";
 import { Devs } from "@utils/constants";
 import definePlugin, { OptionType } from "@utils/types";
@@ -249,7 +249,8 @@ export default definePlugin({
 
     start() {
         addChatBarButton("UwUfyToggle", UwUfyToggle);
-        this.uwuPreSend = addPreSendListener((_, message) => {
+
+        this.preSendListener = addMessagePreSendListener((_, message) => {
             if (!settings.store.enableUwUfy) return;
             message.content = uwufyString(message.content);
         });
@@ -257,6 +258,6 @@ export default definePlugin({
 
     stop() {
         removeChatBarButton("UwUfyToggle");
-        removePreSendListener(this.uwuPreSend);
+        removeMessagePreSendListener(this.preSendListener);
     }
 });

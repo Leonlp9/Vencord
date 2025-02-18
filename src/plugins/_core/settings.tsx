@@ -158,9 +158,6 @@ export default definePlugin({
                 aboveActivity: getIntlMessage("ACTIVITY_SETTINGS")
             };
 
-            if (!names[settingsLocation] || names[settingsLocation].endsWith("_SETTINGS"))
-                return firstChild === "PREMIUM";
-
             return header === names[settingsLocation];
         } catch {
             return firstChild === "PREMIUM";

@@ -20,10 +20,9 @@ import { makeLazy, proxyLazy } from "@utils/lazy";
 import { LazyComponent } from "@utils/lazyReact";
 import { Logger } from "@utils/Logger";
 import { canonicalizeMatch } from "@utils/patches";
+import type { WebpackInstance } from "discord-types/other";
 
 import { traceFunction } from "../debug/Tracer";
-import { Flux } from "./common";
-import { AnyModuleFactory, AnyWebpackRequire, ModuleExports, WebpackRequire } from "./wreq";
 
 const logger = new Logger("Webpack");
 
@@ -34,8 +33,8 @@ export let _resolveReady: () => void;
  */
 export const onceReady = new Promise<void>(r => _resolveReady = r);
 
-export let wreq: WebpackRequire;
-export let cache: WebpackRequire["c"];
+export let wreq: WebpackInstance;
+export let cache: WebpackInstance["c"];
 
 export type FilterFn = (mod: any) => boolean;
 
@@ -90,60 +89,33 @@ export const filters = {
     }
 };
 
-export type CallbackFn = (module: ModuleExports, id: PropertyKey) => void;
-export type FactoryListernFn = (factory: AnyModuleFactory, moduleId: PropertyKey) => void;
+export type CallbackFn = (mod: any, id: string) => void;
 
-export const waitForSubscriptions = new Map<FilterFn, CallbackFn>();
+export const subscriptions = new Map<FilterFn, CallbackFn>();
 export const moduleListeners = new Set<CallbackFn>();
-export const factoryListeners = new Set<FactoryListernFn>();
+export const factoryListeners = new Set<(factory: (module: any, exports: any, require: WebpackInstance) => void) => void>();
+export const beforeInitListeners = new Set<(wreq: WebpackInstance) => void>();
 
-export function _initWebpack(webpackRequire: WebpackRequire) {
+export function _initWebpack(webpackRequire: WebpackInstance) {
     wreq = webpackRequire;
     cache = webpackRequire.c;
-
-    Reflect.defineProperty(webpackRequire.c, Symbol.toStringTag, {
-        value: "ModuleCache",
-        configurable: true,
-        writable: true,
-        enumerable: false
-    });
 }
 
 // Credits to Zerebos for implementing this in BD, thus giving the idea for us to implement it too
 const TypedArray = Object.getPrototypeOf(Int8Array);
 
-const PROXY_CHECK = "is this a proxy that returns values for any key?";
-function shouldIgnoreValue(value: any) {
+function _shouldIgnoreValue(value: any) {
     if (value == null) return true;
     if (value === window) return true;
     if (value === document || value === document.documentElement) return true;
-    if (value[Symbol.toStringTag] === "DOMTokenList" || value[Symbol.toStringTag] === "IntlMessagesProxy") return true;
-    // Discord might export a Proxy that returns non-null values for any property key which would pass all findByProps filters.
-    // One example of this is their i18n Proxy. However, that is already covered by the IntlMessagesProxy check above.
-    // As a fallback if they ever change the name or add a new Proxy, use a unique string to detect such proxies and ignore them
-    if (value[PROXY_CHECK] !== void 0) {
-        // their i18n Proxy "caches" by setting each accessed property to the return, so try to delete
-        Reflect.deleteProperty(value, PROXY_CHECK);
-        return true;
-    }
+    if (value[Symbol.toStringTag] === "DOMTokenList") return true;
     if (value instanceof TypedArray) return true;
 
     return false;
 }
 
-function makePropertyNonEnumerable(target: Object, key: PropertyKey) {
-    const descriptor = Object.getOwnPropertyDescriptor(target, key);
-    if (descriptor == null) return;
-
-    Reflect.defineProperty(target, key, {
-        ...descriptor,
-        enumerable: false
-    });
-}
-
-export function _blacklistBadModules(requireCache: NonNullable<AnyWebpackRequire["c"]>, exports: ModuleExports, moduleId: PropertyKey) {
-    if (shouldIgnoreValue(exports)) {
-        makePropertyNonEnumerable(requireCache, moduleId);
+export function _shouldIgnoreModule(exports: any) {
+    if (_shouldIgnoreValue(exports)) {
         return true;
     }
 
@@ -151,16 +123,14 @@ export function _blacklistBadModules(requireCache: NonNullable<AnyWebpackRequire
         return false;
     }
 
-    let hasOnlyBadProperties = true;
+    let allNonEnumerable = true;
     for (const exportKey in exports) {
-        if (shouldIgnoreValue(exports[exportKey])) {
-            makePropertyNonEnumerable(exports, exportKey);
-        } else {
-            hasOnlyBadProperties = false;
+        if (!_shouldIgnoreValue(exports[exportKey])) {
+            allNonEnumerable = false;
         }
     }
 
-    return hasOnlyBadProperties;
+    return allNonEnumerable;
 }
 
 let devToolsOpen = false;
@@ -428,10 +398,7 @@ export function findByCodeLazy(...code: CodeFilter) {
  * Find a store by its displayName
  */
 export function findStore(name: StoreNameFilter) {
-    const res = Flux.Store.getAll
-        ? Flux.Store.getAll().find(filters.byStoreName(name))
-        : find(filters.byStoreName(name), { isIndirect: true });
-
+    const res = find(filters.byStoreName(name), { isIndirect: true });
     if (!res)
         handleModuleNotFound("findStore", name);
     return res;
@@ -499,27 +466,12 @@ export function findExportedComponentLazy<T extends object = any>(...props: Prop
     });
 }
 
-function getAllPropertyNames(object: Object, includeNonEnumerable: boolean) {
-    const names = new Set<PropertyKey>();
-
-    const getKeys = includeNonEnumerable ? Object.getOwnPropertyNames : Object.keys;
-    do {
-        getKeys(object).forEach(name => names.add(name));
-        object = Object.getPrototypeOf(object);
-    } while (object != null);
-
-    return names;
-}
-
 /**
  * Finds a mangled module by the provided code "code" (must be unique and can be anywhere in the module)
  * then maps it into an easily usable module via the specified mappers.
  *
  * @param code The code to look for
  * @param mappers Mappers to create the non mangled exports
- * @param includeBlacklistedExports Whether to include blacklisted exports in the search.
- *                                  These exports are dangerous. Accessing properties on them may throw errors
- *                                  or always return values (so a byProps filter will always return true)
  * @returns Unmangled exports as specified in mappers
  *
  * @example mapMangledModule("headerIdIsManaged:", {
@@ -527,7 +479,7 @@ function getAllPropertyNames(object: Object, includeNonEnumerable: boolean) {
  *             closeModal: filters.byCode("key==")
  *          })
  */
-export const mapMangledModule = traceFunction("mapMangledModule", function mapMangledModule<S extends string>(code: string | RegExp | CodeFilter, mappers: Record<S, FilterFn>, includeBlacklistedExports = false): Record<S, any> {
+export const mapMangledModule = traceFunction("mapMangledModule", function mapMangledModule<S extends string>(code: string | RegExp | CodeFilter, mappers: Record<S, FilterFn>): Record<S, any> {
     const exports = {} as Record<S, any>;
 
     const id = findModuleId(...Array.isArray(code) ? code : [code]);
@@ -535,9 +487,8 @@ export const mapMangledModule = traceFunction("mapMangledModule", function mapMa
         return exports;
 
     const mod = wreq(id as any);
-    const keys = getAllPropertyNames(mod, includeBlacklistedExports);
     outer:
-    for (const key of keys) {
+    for (const key in mod) {
         const member = mod[key];
         for (const newName in mappers) {
             // if the current mapper matches this module
@@ -551,13 +502,24 @@ export const mapMangledModule = traceFunction("mapMangledModule", function mapMa
 });
 
 /**
- * lazy mapMangledModule
-  * @see {@link mapMangledModule}
- */
-export function mapMangledModuleLazy<S extends string>(code: string | RegExp | CodeFilter, mappers: Record<S, FilterFn>, includeBlacklistedExports = false): Record<S, any> {
-    if (IS_REPORTER) lazyWebpackSearchHistory.push(["mapMangledModule", [code, mappers, includeBlacklistedExports]]);
+ * {@link mapMangledModule}, lazy.
 
-    return proxyLazy(() => mapMangledModule(code, mappers, includeBlacklistedExports));
+ * Finds a mangled module by the provided code "code" (must be unique and can be anywhere in the module)
+ * then maps it into an easily usable module via the specified mappers.
+ *
+ * @param code The code to look for
+ * @param mappers Mappers to create the non mangled exports
+ * @returns Unmangled exports as specified in mappers
+ *
+ * @example mapMangledModule("headerIdIsManaged:", {
+ *             openModal: filters.byCode("headerIdIsManaged:"),
+ *             closeModal: filters.byCode("key==")
+ *          })
+ */
+export function mapMangledModuleLazy<S extends string>(code: string | RegExp | CodeFilter, mappers: Record<S, FilterFn>): Record<S, any> {
+    if (IS_REPORTER) lazyWebpackSearchHistory.push(["mapMangledModule", [code, mappers]]);
+
+    return proxyLazy(() => mapMangledModule(code, mappers));
 }
 
 export const DefaultExtractAndLoadChunksRegex = /(?:(?:Promise\.all\(\[)?(\i\.e\("?[^)]+?"?\)[^\]]*?)(?:\]\))?|Promise\.resolve\(\))\.then\(\i\.bind\(\i,"?([^)]+?)"?\)\)/;
@@ -569,7 +531,7 @@ export const ChunkIdsRegex = /\("([^"]+?)"\)/g;
  * @param matcher A RegExp that returns the chunk ids array as the first capture group and the entry point id as the second. Defaults to a matcher that captures the first lazy chunk loading found in the module factory
  * @returns A promise that resolves with a boolean whether the chunks were loaded
  */
-export async function extractAndLoadChunks(code: CodeFilter, matcher = DefaultExtractAndLoadChunksRegex) {
+export async function extractAndLoadChunks(code: CodeFilter, matcher: RegExp = DefaultExtractAndLoadChunksRegex) {
     const module = findModuleFactory(...code);
     if (!module) {
         const err = new Error("extractAndLoadChunks: Couldn't find module factory");
@@ -582,7 +544,7 @@ export async function extractAndLoadChunks(code: CodeFilter, matcher = DefaultEx
         return false;
     }
 
-    const match = String(module).match(canonicalizeMatch(matcher));
+    const match = module.toString().match(canonicalizeMatch(matcher));
     if (!match) {
         const err = new Error("extractAndLoadChunks: Couldn't find chunk loading in module factory code");
         logger.warn(err, "Code:", code, "Matcher:", matcher);
@@ -595,9 +557,8 @@ export async function extractAndLoadChunks(code: CodeFilter, matcher = DefaultEx
     }
 
     const [, rawChunkIds, entryPointId] = match;
-
-    if (entryPointId == null) {
-        const err = new Error("extractAndLoadChunks: Matcher didn't return a capturing group with the chunk ids array or the entry point id");
+    if (Number.isNaN(Number(entryPointId))) {
+        const err = new Error("extractAndLoadChunks: Matcher didn't return a capturing group with the chunk ids array, or the entry point id returned as the second group wasn't a number");
         logger.warn(err, "Code:", code, "Matcher:", matcher);
 
         // Strict behaviour in DevBuilds to fail early and make sure the issue is found
@@ -607,19 +568,12 @@ export async function extractAndLoadChunks(code: CodeFilter, matcher = DefaultEx
         return false;
     }
 
-    const numEntryPoint = Number(entryPointId);
-    const entryPoint = Number.isNaN(numEntryPoint) ? entryPointId : numEntryPoint;
-
     if (rawChunkIds) {
-        const chunkIds = Array.from(rawChunkIds.matchAll(ChunkIdsRegex)).map(m => {
-            const numChunkId = Number(m[1]);
-            return Number.isNaN(numChunkId) ? m[1] : numChunkId;
-        });
-
+        const chunkIds = Array.from(rawChunkIds.matchAll(ChunkIdsRegex)).map((m: any) => Number(m[1]));
         await Promise.all(chunkIds.map(id => wreq.e(id)));
     }
 
-    if (wreq.m[entryPoint] == null) {
+    if (wreq.m[entryPointId] == null) {
         const err = new Error("extractAndLoadChunks: Entry point is not loaded in the module factories, perhaps one of the chunks failed to load");
         logger.warn(err, "Code:", code, "Matcher:", matcher);
 
@@ -630,7 +584,7 @@ export async function extractAndLoadChunks(code: CodeFilter, matcher = DefaultEx
         return false;
     }
 
-    wreq(entryPoint);
+    wreq(Number(entryPointId));
     return true;
 }
 
@@ -667,7 +621,7 @@ export function waitFor(filter: string | PropsFilter | FilterFn, callback: Callb
         if (existing) return void callback(existing, id);
     }
 
-    waitForSubscriptions.set(filter, callback);
+    subscriptions.set(filter, callback);
 }
 
 /**
@@ -683,7 +637,7 @@ export function search(...code: CodeFilter) {
     const factories = wreq.m;
 
     for (const id in factories) {
-        const factory = factories[id];
+        const factory = factories[id].original ?? factories[id];
 
         if (stringMatches(factory.toString(), code))
             results[id] = factory;

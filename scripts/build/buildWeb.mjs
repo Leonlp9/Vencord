@@ -17,30 +17,29 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-// @ts-check
-
+import esbuild from "esbuild";
 import { readFileSync } from "fs";
 import { appendFile, mkdir, readdir, readFile, rm, writeFile } from "fs/promises";
 import { join } from "path";
 import Zip from "zip-local";
 
-import { BUILD_TIMESTAMP, commonOpts, globPlugins, IS_DEV, IS_REPORTER, VERSION, commonRendererPlugins, buildOrWatchAll, stringifyValues } from "./common.mjs";
+import { BUILD_TIMESTAMP, commonOpts, globPlugins, IS_DEV, IS_REPORTER, VERSION, commonRendererPlugins } from "./common.mjs";
 
 /**
- * @type {import("esbuild").BuildOptions}
+ * @type {esbuild.BuildOptions}
  */
 const commonOptions = {
     ...commonOpts,
     entryPoints: ["browser/Vencord.ts"],
-    format: "iife",
     globalName: "Vencord",
+    format: "iife",
     external: ["~plugins", "~git-hash", "/assets/*"],
-    target: ["esnext"],
     plugins: [
         globPlugins("web"),
         ...commonRendererPlugins
     ],
-    define: stringifyValues({
+    target: ["esnext"],
+    define: {
         IS_WEB: true,
         IS_EXTENSION: false,
         IS_STANDALONE: true,
@@ -49,9 +48,9 @@ const commonOptions = {
         IS_DISCORD_DESKTOP: false,
         IS_VESKTOP: false,
         IS_UPDATER_DISABLED: true,
-        VERSION,
+        VERSION: JSON.stringify(VERSION),
         BUILD_TIMESTAMP
-    })
+    }
 };
 
 const MonacoWorkerEntryPoints = [
@@ -59,59 +58,70 @@ const MonacoWorkerEntryPoints = [
     "vs/editor/editor.worker.js"
 ];
 
-/** @type {import("esbuild").BuildOptions[]} */
-const buildConfigs = [
-    {
-        entryPoints: MonacoWorkerEntryPoints.map(entry => `node_modules/monaco-editor/esm/${entry}`),
-        bundle: true,
-        minify: true,
-        format: "iife",
-        outbase: "node_modules/monaco-editor/esm/",
-        outdir: "dist/vendor/monaco"
-    },
-    {
-        entryPoints: ["browser/monaco.ts"],
-        bundle: true,
-        minify: true,
-        format: "iife",
-        outfile: "dist/vendor/monaco/index.js",
-        loader: {
-            ".ttf": "file"
-        }
-    },
-    {
-        ...commonOptions,
-        outfile: "dist/browser.js",
-        footer: { js: "//# sourceURL=VencordWeb" }
-    },
-    {
-        ...commonOptions,
-        outfile: "dist/extension.js",
-        define: {
-            ...commonOptions.define,
-            IS_EXTENSION: "true"
-        },
-        footer: { js: "//# sourceURL=VencordWeb" }
-    },
-    {
-        ...commonOptions,
-        inject: ["browser/GMPolyfill.js", ...(commonOptions?.inject || [])],
-        define: {
-            ...commonOptions.define,
-            window: "unsafeWindow",
-        },
-        outfile: "dist/Vencord.user.js",
-        banner: {
-            js: readFileSync("browser/userscript.meta.js", "utf-8").replace("%version%", `${VERSION}.${new Date().getTime()}`)
-        },
-        footer: {
-            // UserScripts get wrapped in an iife, so define Vencord prop on window that returns our local
-            js: "Object.defineProperty(unsafeWindow,'Vencord',{get:()=>Vencord});"
-        }
-    }
+const RnNoiseFiles = [
+    "dist/rnnoise.wasm",
+    "dist/rnnoise_simd.wasm",
+    "dist/rnnoise/workletProcessor.js",
+    "LICENSE"
 ];
 
-await buildOrWatchAll(buildConfigs);
+await Promise.all(
+    [
+        esbuild.build({
+            entryPoints: MonacoWorkerEntryPoints.map(entry => `node_modules/monaco-editor/esm/${entry}`),
+            bundle: true,
+            minify: true,
+            format: "iife",
+            outbase: "node_modules/monaco-editor/esm/",
+            outdir: "dist/monaco"
+        }),
+        esbuild.build({
+            entryPoints: ["browser/monaco.ts"],
+            bundle: true,
+            minify: true,
+            format: "iife",
+            outfile: "dist/monaco/index.js",
+            loader: {
+                ".ttf": "file"
+            }
+        }),
+        esbuild.build({
+            ...commonOptions,
+            outfile: "dist/browser.js",
+            footer: { js: "//# sourceURL=VencordWeb" }
+        }),
+        esbuild.build({
+            ...commonOptions,
+            outfile: "dist/extension.js",
+            define: {
+                ...commonOptions?.define,
+                IS_EXTENSION: true,
+            },
+            footer: { js: "//# sourceURL=VencordWeb" }
+        }),
+        esbuild.build({
+            ...commonOptions,
+            inject: ["browser/GMPolyfill.js", ...(commonOptions?.inject || [])],
+            define: {
+                ...(commonOptions?.define),
+                window: "unsafeWindow",
+            },
+            outfile: "dist/Vencord.user.js",
+            banner: {
+                js: readFileSync("browser/userscript.meta.js", "utf-8").replace("%version%", `${VERSION}.${new Date().getTime()}`)
+            },
+            footer: {
+                // UserScripts get wrapped in an iife, so define Vencord prop on window that returns our local
+                js: "Object.defineProperty(unsafeWindow,'Vencord',{get:()=>Vencord});"
+            }
+        })
+    ]
+).catch(err => {
+    console.error("Build failed");
+    console.error(err.message);
+    if (!commonOpts.watch)
+        process.exit(1);
+});;
 
 /**
  * @type {(dir: string) => Promise<string[]>}
@@ -145,13 +155,16 @@ async function buildExtension(target, files) {
     const entries = {
         "dist/Vencord.js": await readFile("dist/extension.js"),
         "dist/Vencord.css": await readFile("dist/extension.css"),
-        ...await loadDir("dist/vendor/monaco", "dist/"),
+        ...await loadDir("dist/monaco"),
+        ...Object.fromEntries(await Promise.all(RnNoiseFiles.map(async file =>
+            [`third-party/rnnoise/${file.replace(/^dist\//, "")}`, await readFile(`node_modules/@sapphi-red/web-noise-suppressor/${file}`)]
+        ))),
         ...Object.fromEntries(await Promise.all(files.map(async f => {
             let content = await readFile(join("browser", f));
             if (f.startsWith("manifest")) {
                 const json = JSON.parse(content.toString("utf-8"));
                 json.version = VERSION;
-                content = Buffer.from(new TextEncoder().encode(JSON.stringify(json)));
+                content = new TextEncoder().encode(JSON.stringify(json));
             }
 
             return [
@@ -197,6 +210,7 @@ if (!process.argv.includes("--skip-extension")) {
 
     Zip.sync.zip("dist/firefox-unpacked").compress().save("dist/extension-firefox.zip");
     console.info("Packed Firefox Extension written to dist/extension-firefox.zip");
+
 } else {
     await appendCssRuntime;
 }

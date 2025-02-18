@@ -16,13 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-// @ts-check
-
 import "../suppressExperimentalWarnings.js";
 import "../checkNodeVersion.js";
 
 import { exec, execSync } from "child_process";
-import esbuild, { build, context } from "esbuild";
+import esbuild from "esbuild";
 import { constants as FsConstants, readFileSync } from "fs";
 import { access, readdir, readFile } from "fs/promises";
 import { minify as minifyHtml } from "html-minifier-terser";
@@ -33,7 +31,7 @@ import { getPluginTarget } from "../utils.mjs";
 import { builtinModules } from "module";
 
 /** @type {import("../../package.json")} */
-const PackageJSON = JSON.parse(readFileSync("package.json", "utf-8"));
+const PackageJSON = JSON.parse(readFileSync("package.json"));
 
 export const VERSION = PackageJSON.version;
 // https://reproducible-builds.org/docs/source-date-epoch/
@@ -55,34 +53,6 @@ export const banner = {
 // Updater Disabled: ${IS_UPDATER_DISABLED}
 `.trim()
 };
-
-/**
- * JSON.stringify all values in an object
- * @type {(obj: Record<string, any>) => Record<string, string>}
- */
-export function stringifyValues(obj) {
-    for (const key in obj) {
-        obj[key] = JSON.stringify(obj[key]);
-    }
-    return obj;
-}
-
-/**
- * @param {import("esbuild").BuildOptions[]} buildConfigs
- */
-export async function buildOrWatchAll(buildConfigs) {
-    if (watch) {
-        await Promise.all(buildConfigs.map(cfg =>
-            context(cfg).then(ctx => ctx.watch())
-        ));
-    } else {
-        await Promise.all(buildConfigs.map(cfg => build(cfg)))
-            .catch(error => {
-                console.error(error.message);
-                process.exit(1); // exit immediately to skip the rest of the builds
-            });
-    }
-}
 
 const PluginDefinitionNameMatcher = /definePlugin\(\{\s*(["'])?name\1:\s*(["'`])(.+?)\2/;
 /**
@@ -341,16 +311,18 @@ export const banImportPlugin = (filter, message) => ({
 export const commonOpts = {
     logLevel: "info",
     bundle: true,
-    minify: !watch && !IS_REPORTER,
-    sourcemap: watch ? "inline" : "external",
+    watch,
+    minify: !watch,
+    sourcemap: watch ? "inline" : "",
     legalComments: "linked",
     banner,
     plugins: [fileUrlPlugin, gitHashPlugin, gitRemotePlugin, stylePlugin],
     external: ["~plugins", "~git-hash", "~git-remote", "/assets/*"],
     inject: ["./scripts/build/inject/react.mjs"],
-    jsx: "transform",
     jsxFactory: "VencordCreateElement",
-    jsxFragment: "VencordFragment"
+    jsxFragment: "VencordFragment",
+    // Work around https://github.com/evanw/esbuild/issues/2460
+    tsconfig: "./scripts/build/tsconfig.esbuild.json"
 };
 
 const escapedBuiltinModules = builtinModules
@@ -363,6 +335,5 @@ export const commonRendererPlugins = [
     banImportPlugin(/^react$/, "Cannot import from react. React and hooks should be imported from @webpack/common"),
     banImportPlugin(/^electron(\/.*)?$/, "Cannot import electron in browser code. You need to use a native.ts file"),
     banImportPlugin(/^ts-pattern$/, "Cannot import from ts-pattern. match and P should be imported from @webpack/common"),
-    // @ts-ignore this is never undefined
     ...commonOpts.plugins
 ];

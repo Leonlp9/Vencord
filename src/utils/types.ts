@@ -43,10 +43,6 @@ export interface PatchReplacement {
     replace: string | ReplaceFn;
     /** A function which returns whether this patch replacement should be applied */
     predicate?(): boolean;
-    /** The minimum build number for this patch to be applied */
-    fromBuild?: number;
-    /** The maximum build number for this patch to be applied */
-    toBuild?: number;
 }
 
 export interface Patch {
@@ -63,10 +59,6 @@ export interface Patch {
     group?: boolean;
     /** A function which returns whether this patch should be applied */
     predicate?(): boolean;
-    /** The minimum build number for this patch to be applied */
-    fromBuild?: number;
-    /** The maximum build number for this patch to be applied */
-    toBuild?: number;
 }
 
 export interface PluginAuthor {

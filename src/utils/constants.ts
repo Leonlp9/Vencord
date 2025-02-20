@@ -16,7 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-export const WEBPACK_CHUNK = "webpackChunkdiscord_app";
 export const REACT_GLOBAL = "Vencord.Webpack.Common.React";
 export const VENBOT_USER_ID = "1017176847865352332";
 export const VENCORD_GUILD_ID = "1015060230222131221";
@@ -581,6 +580,10 @@ export const Devs = /* #__PURE__*/ Object.freeze({
         name: "SomeAspy",
         id: 516750892372852754n,
     },
+    jamesbt365: {
+        name: "jamesbt365",
+        id: 158567567487795200n,
+    },
     Leonlp9: {
         name: "Leon_lp9",
         id: 480290233032769536n,
@@ -604,10 +607,6 @@ export const Devs = /* #__PURE__*/ Object.freeze({
     minikomo: {
         name: "minikomo",
         id: 1004350636822900748n,
-    },
-    jamesbt365: {
-        name: "jamesbt365",
-        id: 158567567487795200n,
     },
     samsam: {
         name: "samsam",

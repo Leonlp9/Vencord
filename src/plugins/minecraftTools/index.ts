@@ -95,7 +95,7 @@ function formatUUID(uuid: string): string {
 }
 const getUsernameCommand = {
     inputType: ApplicationCommandInputType.BUILT_IN,
-    name: "get-uuid",
+    name: "getUuid",
     description: "Get the UUID of a player by their username",
     options: [
         {

@@ -75,6 +75,7 @@ export default definePlugin({
 
         import("./games/cookieClicker");
         import("./games/tetris");
+        import("./games/minesweeper");
     },
     stop() {
         removeChatBarButton("OfflineGamesButton");

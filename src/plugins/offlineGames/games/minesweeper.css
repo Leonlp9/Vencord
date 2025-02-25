@@ -1,0 +1,185 @@
+.minesweeper-root {
+    width: calc(100% - 6px);
+    min-height: 500px;
+    border: 3px outset #727a82;
+}
+
+.minesweeper-header {
+    display: grid;
+    grid-template-columns: 1fr 60px 1fr;
+    place-items: center;
+    margin-top: 15px;
+}
+
+.restart-button {
+    background-image: url("https://minesweeper.online/img/skins/hdd/face_unpressed.svg?v=15");
+    background-size: 100%;
+    width: 60px;
+    height: 60px;
+    cursor: pointer;
+    transition: background-image 0.3s;
+    outline: none;
+}
+
+.restart-button.gameover {
+    background-image: url("https://minesweeper.online/img/skins/hdd/face_lose.svg?v=15");
+}
+
+.restart-button.win {
+    background-image: url("https://minesweeper.online/img/skins/hdd/face_win.svg?v=15");
+}
+
+.mines-to-flag-left, .timer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: bold;
+    color: #fff;
+    background-color: #040404;
+    border-radius: 5px;
+    padding: 5px 8px;
+    gap: 4px;
+    border: 6px outset #727a82;
+}
+
+.header-num {
+    background-size: 100%;
+    height: 60px;
+    width: 30px;
+}
+
+/* stylelint-disable-next-line selector-class-pattern */
+.header-num-- {
+    background-image: url("https://minesweeper.online/img/skins/hdd/d-.svg?v=15");
+}
+
+.header-num-1 {
+    background-image: url("https://minesweeper.online/img/skins/hdd/d1.svg?v=15");
+}
+
+.header-num-2 {
+    background-image: url("https://minesweeper.online/img/skins/hdd/d2.svg?v=15");
+}
+
+.header-num-3 {
+    background-image: url("https://minesweeper.online/img/skins/hdd/d3.svg?v=15");
+}
+
+.header-num-4 {
+    background-image: url("https://minesweeper.online/img/skins/hdd/d4.svg?v=15");
+}
+
+.header-num-5 {
+    background-image: url("https://minesweeper.online/img/skins/hdd/d5.svg?v=15");
+}
+
+.header-num-6 {
+    background-image: url("https://minesweeper.online/img/skins/hdd/d6.svg?v=15");
+}
+
+.header-num-7 {
+    background-image: url("https://minesweeper.online/img/skins/hdd/d7.svg?v=15");
+}
+
+.header-num-8 {
+    background-image: url("https://minesweeper.online/img/skins/hdd/d8.svg?v=15");
+}
+
+.header-num-9 {
+    background-image: url("https://minesweeper.online/img/skins/hdd/d9.svg?v=15");
+}
+
+.header-num-0 {
+    background-image: url("https://minesweeper.online/img/skins/hdd/d0.svg?v=15");
+}
+
+.minesweeper-board {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    border-radius: 5px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    border: 6px outset #727a82;
+}
+
+.minesweeper-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.minesweeper-cell {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-image: url("https://minesweeper.online/img/skins/hdd/closed.svg?v=15");
+    background-size: 100%;
+    cursor: pointer;
+    transition: background-image 0.3s;
+}
+
+.minesweeper-cell.flagged {
+    background-image: url("https://minesweeper.online/img/skins/hdd/flag.svg?v=15");
+}
+
+.minesweeper-cell.revealed {
+    background-image: url("https://minesweeper.online/img/skins/hdd/type0.svg?v=15");
+}
+
+.minesweeper-cell.revealed1 {
+    background-image: url("https://minesweeper.online/img/skins/hdd/type1.svg?v=15");
+}
+
+.minesweeper-cell.revealed2 {
+    background-image: url("https://minesweeper.online/img/skins/hdd/type2.svg?v=15");
+}
+
+.minesweeper-cell.revealed3 {
+    background-image: url("https://minesweeper.online/img/skins/hdd/type3.svg?v=15");
+}
+
+.minesweeper-cell.revealed4 {
+    background-image: url("https://minesweeper.online/img/skins/hdd/type4.svg?v=15");
+}
+
+.minesweeper-cell.revealed5 {
+    background-image: url("https://minesweeper.online/img/skins/hdd/type5.svg?v=15");
+}
+
+.minesweeper-cell.revealed6 {
+    background-image: url("https://minesweeper.online/img/skins/hdd/type6.svg?v=15");
+}
+
+.minesweeper-cell.revealed7 {
+    background-image: url("https://minesweeper.online/img/skins/hdd/type7.svg?v=15");
+}
+
+.minesweeper-cell.revealed8 {
+    background-image: url("https://minesweeper.online/img/skins/hdd/type8.svg?v=15");
+}
+
+.minesweeper-cell.revealedbomb {
+    background-image: url("https://minesweeper.online/img/skins/hdd/mine_red.svg?v=15");
+    animation: minesweeper-bomb-explode 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards 2;
+}
+
+@keyframes minesweeper-bomb-explode {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.2);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}

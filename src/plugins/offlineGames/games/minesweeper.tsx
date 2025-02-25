@@ -103,6 +103,7 @@ const MinesweeperModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
 
         const newBoard = board.map(row => row.slice());
         const reveal = (row: number, col: number) => {
+
             if (row < 0 || row >= ROWS || col < 0 || col >= COLS || newBoard[row][col].revealed) return;
 
             newBoard[row][col].revealed = true;
@@ -130,7 +131,23 @@ const MinesweeperModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
                 }
             }
         };
+
+        // reveal all cells around the cell if the cell was clicked, and is revealed
+        if (board[row1][col1].revealed) {
+            for (let y = -1; y <= 1; y++) {
+                for (let x = -1; x <= 1; x++) {
+                    const row = row1 + y;
+                    const col = col1 + x;
+                    if (row < 0 || row >= ROWS || col < 0 || col >= COLS) continue;
+                    if (board[row][col].flagged) continue;
+                    reveal(row, col);
+                }
+            }
+            return;
+        }
+
         reveal(row1, col1);
+
         setBoard(newBoard);
     };
 

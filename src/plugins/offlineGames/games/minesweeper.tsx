@@ -19,6 +19,7 @@ const generateBoard = () => {
     const board = Array.from({ length: ROWS }, () => Array.from({ length: COLS }, () => ({
         isBomb: false,
         revealed: false,
+        clicked_bomb: false,
         adjacentBombs: 0,
         flagged: false,
         distance: 0
@@ -71,6 +72,35 @@ const MinesweeperModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
         if (gameOver) return;
         if (win) return;
 
+        const bombList: Array<any> = [];
+
+        const getNearestBomb = (row: number, col: number, i: number) => {
+            if (i >= BOMBS) return;
+            // aus neareast bomb die mit row und col löschen
+            bombList.forEach((bomb, index) => {
+                if (bomb.y === row && bomb.x === col) {
+                    bombList.splice(index, 1);
+                }
+            });
+
+            // suche die nächste bomb von row und col aus im 2d array
+            let nearest = { y: Infinity, x: Infinity };
+            let nearestDistance = Infinity;
+            bombList.forEach(bomb => {
+                const distance = Math.sqrt((row - bomb.y) ** 2 + (col - bomb.x) ** 2);
+                if (distance < nearestDistance) {
+                    nearest = bomb;
+                    nearestDistance = distance;
+                }
+            });
+
+            newBoard[nearest.y][nearest.x].distance = Math.sqrt((row1 - nearest.y) ** 2 + (col1 - nearest.x) ** 2) * i * 0.1;
+            newBoard[nearest.y][nearest.x].revealed = true;
+
+            getNearestBomb(nearest.y, nearest.x, i + 1);
+        };
+
+
         const newBoard = board.map(row => row.slice());
         const reveal = (row: number, col: number) => {
             if (row < 0 || row >= ROWS || col < 0 || col >= COLS || newBoard[row][col].revealed) return;
@@ -79,16 +109,19 @@ const MinesweeperModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
             newBoard[row][col].flagged = false;
             newBoard[row][col].distance = Math.sqrt((row1 - row) ** 2 + (col1 - col) ** 2);
 
+
             if (newBoard[row][col].isBomb) {
                 // reveal all bombs
                 setGameOver(true);
+                newBoard[row][col].clicked_bomb = true;
                 for (let y = 0; y < ROWS; y++) {
                     for (let x = 0; x < COLS; x++) {
                         if (newBoard[y][x].isBomb) {
-                            newBoard[y][x].revealed = true;
+                            bombList.push({ y, x });
                         }
                     }
                 }
+                getNearestBomb(row1, col1, 0);
             } else if (newBoard[row][col].adjacentBombs === 0) {
                 for (let y = -1; y <= 1; y++) {
                     for (let x = -1; x <= 1; x++) {
@@ -168,7 +201,7 @@ const MinesweeperModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
                             {row.map((cell, x) => (
                                 <div
                                     key={x}
-                                    className={`minesweeper-cell ${cell.revealed ? (cell.isBomb ? "revealedbomb" : `revealed revealed${cell.adjacentBombs}`) : ""} ${cell.flagged ? "flagged" : ""}`}
+                                    className={`minesweeper-cell ${cell.revealed ? (cell.isBomb ? (cell.clicked_bomb ? "clickedbomb" : "revealedbomb") : `revealed revealed${cell.adjacentBombs}`) : ""} ${cell.flagged ? "flagged" : ""}`}
                                     onClick={() => {
                                         if (board[y][x].flagged) return;
                                         revealCell(y, x);
@@ -179,7 +212,7 @@ const MinesweeperModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
                                         if (board[y][x].revealed) return;
                                         toggleFlag(y, x);
                                     }}
-                                    style={{ transitionDelay: `${cell.distance * 0.05}s` }}
+                                    style={{ transitionDelay: `${cell.distance * 0.05}s`, animationDelay: `${cell.distance * 0.05}s` }}
                                 >
                                 </div>
                             ))}

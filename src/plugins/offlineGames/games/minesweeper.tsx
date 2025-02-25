@@ -187,6 +187,7 @@ const MinesweeperModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
                         setSeconds(0);
                         setStartTimestamp(Date.now());
                         setStarted(false);
+                        setWin(false);
                     }} className={`restart-button ${gameOver ? "gameover" : ""} ${isWin() ? "win" : ""}`}></button>
                     <div className="timer">
                         {String(seconds).padStart(3, "0").split("").map((num, index) => (

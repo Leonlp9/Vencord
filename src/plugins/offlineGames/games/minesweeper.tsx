@@ -127,6 +127,7 @@ const MinesweeperModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
                 for (let y = -1; y <= 1; y++) {
                     for (let x = -1; x <= 1; x++) {
                         reveal(row + y, col + x);
+                        setBoard(newBoard);
                     }
                 }
             }

@@ -311,7 +311,7 @@ const MinesweeperModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
                                 onChange={e => {
                                     const value = parseInt(e.target.value) || 1;
                                     setCOLS(value);
-                                    setBoard(generateBoard(value, COLS, (BOMBS > value * COLS) ? value * COLS - 1 : BOMBS, RANGE));
+                                    setBoard(generateBoard(ROWS, value, (BOMBS > ROWS * value) ? ROWS * value - 1 : BOMBS, RANGE));
                                     setGameOver(false);
                                     setSeconds(0);
                                     setStartTimestamp(Date.now());
@@ -331,7 +331,7 @@ const MinesweeperModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
 
                                     const value = parseInt(e.target.value) || 1;
                                     setBOMBS(value);
-                                    setBoard(generateBoard(value, COLS, (BOMBS > value * COLS) ? value * COLS - 1 : BOMBS, RANGE));
+                                    setBoard(generateBoard(ROWS, COLS, (BOMBS > ROWS * COLS) ? ROWS * COLS - 1 : BOMBS, RANGE));
                                     setGameOver(false);
                                     setSeconds(0);
                                     setStartTimestamp(Date.now());
@@ -351,7 +351,7 @@ const MinesweeperModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
                                 onChange={e => {
                                     const value = parseInt(e.target.value) || 1;
                                     setRANGE(value);
-                                    setBoard(generateBoard(value, COLS, (BOMBS > value * COLS) ? value * COLS - 1 : BOMBS, RANGE));
+                                    setBoard(generateBoard(ROWS, COLS, (BOMBS > ROWS * COLS) ? ROWS * COLS - 1 : BOMBS, RANGE));
                                     setGameOver(false);
                                     setSeconds(0);
                                     setStartTimestamp(Date.now());

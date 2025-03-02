@@ -49,6 +49,13 @@ jobs:
               run: |
                   echo "release_tag=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
+            - name: Create DevBuild release if not exists
+              run: |
+                  gh release create devbuild --title "DevBuild $RELEASE_TAG" || true
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  RELEASE_TAG: ${{ env.release_tag }}
+
             - name: Upload DevBuild as release
               if: github.repository == 'Leonlp9/Vencord'
               run: |

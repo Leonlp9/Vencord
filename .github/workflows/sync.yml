@@ -24,4 +24,4 @@ jobs:
         run: |
           git checkout main
           git merge upstream/main --allow-unrelated-histories || true
-          git push https://${{ secrets.PAT_TOKEN }}@github.com/YOUR_GITHUB_USERNAME/REPO_NAME.git main
+          git push https://${{ secrets.PAT_TOKEN }}@github.com/Leonlp9/Vencord.git main

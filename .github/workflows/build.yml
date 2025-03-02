@@ -49,9 +49,22 @@ jobs:
               run: |
                   echo "release_tag=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
-            - name: Create DevBuild release if not exists
+            - name: Check if release exists
+              id: check_release
               run: |
-                  gh release create devbuild --title "DevBuild $RELEASE_TAG" || true
+                  if gh release view devbuild; then
+                    echo "release_exists=true" >> $GITHUB_ENV
+                  else
+                    echo "release_exists=false" >> $GITHUB_ENV
+                  fi
+
+            - name: Create or update DevBuild release
+              run: |
+                  if [ "${{ env.release_exists }}" = "true" ]; then
+                    gh release edit devbuild --title "DevBuild $RELEASE_TAG"
+                  else
+                    gh release create devbuild --title "DevBuild $RELEASE_TAG"
+                  fi
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                   RELEASE_TAG: ${{ env.release_tag }}
@@ -60,7 +73,6 @@ jobs:
               if: github.repository == 'Leonlp9/Vencord'
               run: |
                   gh release upload devbuild --clobber dist/*
-                  gh release edit devbuild --title "DevBuild $RELEASE_TAG"
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                   RELEASE_TAG: ${{ env.release_tag }}

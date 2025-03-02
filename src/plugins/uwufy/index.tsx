@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { addChatBarButton, ChatBarButton, removeChatBarButton } from "@api/ChatButtons";
+import { addChatBarButton, ChatBarButton, ChatBarButtonFactory, removeChatBarButton } from "@api/ChatButtons";
 import { addMessagePreSendListener, removeMessagePreSendListener } from "@api/MessageEvents";
 import { definePluginSettings } from "@api/Settings";
 import { Devs } from "@utils/constants";
@@ -185,7 +185,7 @@ const settings = definePluginSettings({
     }
 });
 
-const UwUfyToggle: ChatBarButton = ({ isMainChat }) => {
+const UwUfyToggle: ChatBarButtonFactory = ({ isMainChat }) => {
     const [enabled, setEnabled] = useState(settings.store.enableUwUfy);
     const [enabledNSFW, setEnabledNSFW] = useState(settings.store.FreakyModeNSFW);
 

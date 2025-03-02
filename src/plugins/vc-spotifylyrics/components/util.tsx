@@ -53,7 +53,7 @@ export function useLyrics() {
 
     useEffect(() => {
         if (currentLyrics) {
-            setLyricRefs(currentLyrics.map(() => React.createRef()));
+            setLyricRefs(currentLyrics.map(() => React.createRef() as React.RefObject<HTMLDivElement>));
         }
     }, [currentLyrics]);
 

@@ -254,8 +254,8 @@ export default definePlugin({
 
             assets,
 
-            buttons: !isRadio && buttons.length ? buttons.map(v => v.label) : undefined,
-            metadata: !isRadio && buttons.length ? { button_urls: buttons.map(v => v.url) } : undefined,
+            buttons: !isRadio && buttons.length ? buttons.map((v: ActivityButton) => v.label) : undefined,
+            metadata: !isRadio && buttons.length ? { button_urls: buttons.map((v: ActivityButton) => v.url) } : undefined,
 
             type: settings.store.activityType,
             flags: ActivityFlag.INSTANCE,

@@ -14,6 +14,11 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Set Git User
+        run: |
+          git config --global user.email "leon.marcel.rabe@gmail.com"
+          git config --global user.name "Leon Rabe"
+
       - name: Add Upstream Remote
         run: git remote add upstream https://github.com/Vendicated/Vencord.git
 

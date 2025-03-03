@@ -25,8 +25,28 @@ jobs:
       - name: Fetch Upstream Changes
         run: git fetch upstream
 
-      - name: Merge Upstream Changes
+      - name: Create New Branch
         run: |
-          git checkout main
-          git merge upstream/main --allow-unrelated-histories || true
-          git push https://${{ secrets.PAT_TOKEN }}@github.com/Leonlp9/Vencord.git main
+          git checkout -b sync-upstream
+
+      - name: Merge Upstream Changes
+        run: git merge upstream/main --allow-unrelated-histories || true
+
+      - name: Push Changes
+        run: git push https://${{ secrets.PAT_TOKEN }}@github.com/Leonlp9/Vencord.git sync-upstream
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v4
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+          branch: sync-upstream
+          title: 'Sync Upstream Changes'
+          body: 'This PR merges changes from the upstream repository into the main branch.'
+          labels: 'sync'
+
+      - name: Auto Merge Pull Request
+        uses: "peter-evans/enable-pull-request-automerge@v2"
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+          pull-request-number: ${{ steps.create-pull-request.outputs.pull-request-number }}
+          merge-method: squash

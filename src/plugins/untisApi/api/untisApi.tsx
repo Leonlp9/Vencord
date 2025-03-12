@@ -247,7 +247,7 @@ class WebUntisAPI {
         };
 
         const result = await this.fetchFromAPI(
-            `https://arche.webuntis.com/WebUntis/jsonrpc_intern.do?a=0&m=getAuthToken&s=arche.webuntis.com&school=${this.school}&v=i3.45.1`,
+            `https://${this.untisver}.webuntis.com/WebUntis/jsonrpc_intern.do?a=0&m=getAuthToken&s=${this.untisver}.webuntis.com&school=${this.school}&v=i3.45.1`,
             "getAuthToken",
             { auth: authParams }
         );
@@ -293,7 +293,7 @@ class WebUntisAPI {
         };
 
         const result = await this.fetchFromAPI(
-            `https://arche.webuntis.com/WebUntis/jsonrpc_intern.do?a=0&m=getTimetable2017&s=arche.webuntis.com&school=${this.school}&v=i3.45.1`,
+            `https://${this.untisver}.webuntis.com/WebUntis/jsonrpc_intern.do?a=0&m=getTimetable2017&s=${this.untisver}.webuntis.com&school=${this.school}&v=i3.45.1`,
             "getTimetable2017",
             timetableParams
         );

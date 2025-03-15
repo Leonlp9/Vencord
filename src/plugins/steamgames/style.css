@@ -2,6 +2,7 @@
 /* stylelint-disable selector-class-pattern */
 /* stylelint-disable shorthand-property-no-redundant-values */
 /* stylelint-disable rule-empty-line-before */
+
 .vc-steam-ui {
     position: fixed;
     z-index: 1000;
@@ -13,6 +14,7 @@
     border-radius: 10px;
     border: 1px solid #4d4d4d;
     max-height: 100%;
+    font-family: 'Exo 2', sans-serif;
 }
 
 .vc-steam-ui::-webkit-scrollbar {
@@ -134,13 +136,34 @@
 }
 
 .vc-steam-ui-modal-body {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    grid-auto-rows: 125px;
+    display: flex;
+    flex-direction: column;
     gap: 10px;
     padding: 10px;
     height: calc(100% - 125px);
     overflow: auto;
+}
+
+.vc-steam-ui-category-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.vc-steam-ui-category-group h3 {
+    font-size: 1.5rem;
+    color: var(--text-normal);
+    text-align: center;
+    width: 100%;
+    border-bottom: 1px solid #4d4d4d;
+    padding-bottom: 10px;
+}
+
+.vc-steam-ui-category-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    grid-auto-rows: 125px;
+    gap: 10px;
 }
 
 .vc-steam-ui-modal-body::-webkit-scrollbar {
@@ -234,6 +257,117 @@
 }
 
 .vc-steam-ui-modal-footer button {
+    width: 100%;
+    height: 30px;
+}
+
+.vc-steam-ui-edit-button {
+    background-color: var(--background-secondary);
+    position: absolute;
+    right: -10px;
+    top: -10px;
+    align-items: center;
+    color: var(--interactive-normal);
+    cursor: pointer;
+    transition: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform: scale(1) rotate(0deg);
+    border-radius: 10px;
+    padding: 5px;
+    opacity: 0;
+    z-index: 1;
+    width: 30px;
+}
+
+.vc-steam-ui-edit-button:hover {
+    background-color: var(--interactive-normal);
+    color: var(--background-secondary);
+    border-radius: 5px;
+}
+
+.vc-steam-ui-game:hover .vc-steam-ui-edit-button {
+    opacity: 1;
+}
+
+.vc-steam-ui-edit-modal {
+    height: 100%;
+    color: var(--text-normal);
+}
+
+.vc-steam-ui-edit-modal-content {
+    height: 100%;
+}
+
+.vc-steam-ui-edit-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #4d4d4d;
+}
+
+.vc-steam-ui-edit-modal-header h2 {
+    font-size: 1.5rem;
+    color: var(--text-normal);
+    text-transform: uppercase;
+    text-align: center;
+    width: 100%;
+}
+
+.vc-steam-ui-edit-modal-body {
+    display: grid;
+    gap: 10px;
+    padding: 10px;
+    height: calc(100% - 125px);
+    overflow: auto;
+}
+
+.vc-steam-ui-edit-modal-body input {
+    width: calc(100% - 20px);
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #4d4d4d;
+    background-color: var(--background-secondary);
+    color: var(--text-normal);
+}
+
+.vc-steam-ui-edit-modal-body::-webkit-scrollbar {
+    background-color: var(--background-secondary);
+    width: 10px;
+}
+
+.vc-steam-ui-edit-modal-body::-webkit-scrollbar-thumb {
+    background: var(--interactive-normal);
+    border-radius: 10px;
+}
+
+.vc-steam-ui-edit-modal-body::-webkit-scrollbar-thumb:hover {
+    background: var(--interactive-active);
+}
+
+.vc-steam-ui-edit-modal-body::-webkit-scrollbar-track {
+    background: var(--background-secondary);
+}
+
+.vc-steam-ui-edit-modal-footer {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    border-top: 1px solid #4d4d4d;
+}
+
+.vc-steam-ui-edit-modal-footer input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #4d4d4d;
+    background-color: var(--background-secondary);
+    color: var(--text-normal);
+}
+
+.vc-steam-ui-edit-modal-footer button {
     width: 100%;
     height: 30px;
 }

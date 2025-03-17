@@ -20,13 +20,8 @@ export interface HGLaborPlayer {
 
 class HGLaborAPI {
 
-    // https://api.hglabor.de/stats/%gamemode%/top?sort=%sort%&page=%page%
-    // https://api.hglabor.de/stats/%gamemode%/%playerid%
-
-
     async getPlayer(playerNameOrId: string): Promise<HGLaborPlayer> {
 
-        // `https://playerdb.co/api/player/minecraft/${playerNameOrId}`
         const playerDB = await fetch(`https://playerdb.co/api/player/minecraft/${playerNameOrId}`).then(response => response.json());
         const playerId = playerDB.data.player.id;
 

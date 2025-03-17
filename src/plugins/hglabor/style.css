@@ -107,6 +107,12 @@
     margin: 10px 0;
     overflow-y: auto;
     font-family: Monocraft, monospace;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    min-width: fit-content;
 }
 
 .vc-user-hglabor-ui::-webkit-scrollbar {

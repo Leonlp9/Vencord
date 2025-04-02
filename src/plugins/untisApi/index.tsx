@@ -501,52 +501,50 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
 
 const SingleLessonModalContent = ({ rootProps, period }: { rootProps: ModalProps; period: any; }) => {
     return (
-        <ModalRoot {...rootProps}>
-            <div className="vc-untis-single-lesson">
-                <h2>{period.subjects[0].name} ({period.subjects[0].longName})</h2>
-                <p><b>Teacher:</b> {period.teachers.map((teacher: any) => `${teacher.name} (${teacher.longName})`).join(", ")}</p>
-                <p><b>Room:</b> {period.rooms.map((room: any) => `${room.name} (${room.longName})`).join(", ")}</p>
-                <p><b>Class:</b> {period.classes.map((class_: any) => (
-                    <span key={class_.id} title={class_.longName}>{class_.name}</span>
-                )).reduce((prev, curr) => [prev, ", ", curr])}</p>
-                <p><b>Is:</b> {period.is[0]}</p>
+        <ModalRoot {...rootProps} className={`vc-untis-single-lesson-modal ${period.is}`}>
+            <h2>{period.subjects[0].name} ({period.subjects[0].longName})</h2>
+            <p><b>Teacher:</b> {period.teachers.map((teacher: any) => `${teacher.name} (${teacher.longName})`).join(", ")}</p>
+            <p><b>Room:</b> {period.rooms.map((room: any) => `${room.name} (${room.longName})`).join(", ")}</p>
+            <p><b>Class:</b> {period.classes.map((class_: any) => (
+                <span key={class_.id} title={class_.longName}>{class_.name}</span>
+            )).reduce((prev, curr) => [prev, ", ", curr])}</p>
+            <p><b>Is:</b> {period.is[0]}</p>
 
-                {period.text.lesson && (
-                    <div className="vc-untis-single-lesson-text">
-                        <h3>Lesson</h3>
-                        <p>{period.text.lesson}</p>
+            {period.text.lesson && (
+                <div className="vc-untis-single-lesson-text">
+                    <h3>Lesson</h3>
+                    <p>{period.text.lesson}</p>
+                </div>
+            )}
+
+            {period.text.substitution && (
+                <div className="vc-untis-single-lesson-text">
+                    <h3>Substitution</h3>
+                    <p>{period.text.substitution}</p>
+                </div>
+            )}
+
+            {period.text.info && (
+                <div className="vc-untis-single-lesson-text">
+                    <h3>Info</h3>
+                    <p>{period.text.info}</p>
+                </div>
+            )}
+
+            {period.homeWorks
+                .filter((homework: any) => homework.endDate === period.startDateTime.split("T")[0])
+                .length > 0 && (
+                    <div className="vc-untis-single-lesson-homework">
+                        <h3>Homeworks</h3>
+                        {period.homeWorks
+                            .filter((homework: any) => homework.endDate === period.startDateTime.split("T")[0])
+                            .map((homework: any) => (
+                                <div key={homework.id}>
+                                    <p>{homework.text}</p>
+                                </div>
+                            ))}
                     </div>
                 )}
-
-                {period.text.substitution && (
-                    <div className="vc-untis-single-lesson-text">
-                        <h3>Substitution</h3>
-                        <p>{period.text.substitution}</p>
-                    </div>
-                )}
-
-                {period.text.info && (
-                    <div className="vc-untis-single-lesson-text">
-                        <h3>Info</h3>
-                        <p>{period.text.info}</p>
-                    </div>
-                )}
-
-                {period.homeWorks
-                    .filter((homework: any) => homework.endDate === period.startDateTime.split("T")[0])
-                    .length > 0 && (
-                        <div className="vc-untis-single-lesson-homework">
-                            <h3>Homeworks</h3>
-                            {period.homeWorks
-                                .filter((homework: any) => homework.endDate === period.startDateTime.split("T")[0])
-                                .map((homework: any) => (
-                                    <div key={homework.id}>
-                                        <p>{homework.text}</p>
-                                    </div>
-                                ))}
-                        </div>
-                    )}
-            </div>
         </ModalRoot>
     );
 };

@@ -216,3 +216,48 @@
     color: var(--text-normal);
     text-decoration: underline;
 }
+
+
+.vc-untis-single-lesson-modal {
+    background-color: color-mix(in srgb, var(--background-primary), transparent 50%);
+    border-radius: 25px !important;
+    box-shadow: 0 0 10px color-mix(in srgb, var(--background-primary), transparent 25%);
+    transform: scale(0.9);
+    padding: 20px;
+    border: none !important;
+    color: var(--text-normal);
+    font-size: 18px;
+    font-family: sans-serif;
+}
+
+.vc-untis-single-lesson-modal.CANCELLED {
+    background-color: color-mix(in srgb, color-mix(in srgb, var(--background-primary), transparent 50%), red 4%);
+}
+.vc-untis-single-lesson-modal.IRREGULAR {
+    background-color: color-mix(in srgb, color-mix(in srgb, var(--background-primary), transparent 50%), yellow 4%);
+}
+
+.vc-untis-single-lesson-modal h2 {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0 0 10px 0;
+    border-bottom: 2px solid var(--text-normal);
+    padding-bottom: 10px;
+    text-align: center;
+}
+
+.vc-untis-single-lesson-text {
+    font-size: 18px;
+    margin: 0 0 10px 0;
+    text-align: center;
+}
+
+.vc-untis-single-lesson-homework {
+    font-size: 18px;
+    margin: 0 0 10px 0;
+    text-align: center;
+    background-color: color-mix(in srgb, var(--background-primary), transparent 50%);
+    border-radius: 25px !important;
+    padding: 10px;
+    box-shadow: 0 0 10px color-mix(in srgb, var(--background-primary), transparent 25%);
+}

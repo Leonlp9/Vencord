@@ -18,7 +18,6 @@ import definePlugin, { OptionType } from "@utils/types";
 import { findByCodeLazy, findComponentByCodeLazy } from "@webpack";
 import { ApplicationAssetUtils, Button, FluxDispatcher, Forms, GuildStore, React, SelectedChannelStore, SelectedGuildStore, UserStore } from "@webpack/common";
 
-import { period } from "./api/interfaces";
 import WebUntisAPI from "./api/untisApi";
 
 const useProfileThemeStyle = findByCodeLazy("profileThemeStyle:", "--profile-gradient-primary-color");
@@ -64,15 +63,6 @@ const enum ActivityType {
     WATCHING = 3,
     COMPETING = 5
 }
-
-const enum TimestampMode {
-    NONE,
-    NOW,
-    TIME,
-    CUSTOM,
-}
-
-
 
 const settings = definePluginSettings({
     showonlyavailable: {
@@ -275,7 +265,6 @@ const scheduleNextUpdate = () => {
 scheduleNextUpdate();
 
 const handleButtonClick = async () => {
-
     openModal(props => <UntisModalContent rootProps={props} />);
 };
 
@@ -295,15 +284,9 @@ const UntisButton = () => (
 );
 
 const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
-    const [timetable, setTimetable] = React.useState<any[]>([]);
-    const [error, setError] = React.useState<string | null>(null);
     const [timeGrid, setTimeGrid] = React.useState<any>(null);
-    const [holidays, setHolidays] = React.useState<any>(null);
-    const [currentDate, setCurrentDate] = React.useState<Date>(() => {
-        const date = new Date();
-        date.setHours(1, 0, 0, 0);
-        return date;
-    });
+    const [selectedDate, setSelectedDate] = React.useState<string>(new Date().toISOString().split("T")[0]);
+    const [timeTable, setTimeTable] = React.useState<any>(null);
 
     const untis = new WebUntisAPI(
         settings.store.School || "defaultSchool",
@@ -313,283 +296,208 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
         settings.store.UntisType || "STUDENT"
     );
 
+    const getMonday = (date: Date) => {
+        const day = date.getDay();
+        const diff = date.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is sunday
+        return new Date(date.setDate(diff));
+    };
+    const getFriday = (date: Date) => {
+        const day = date.getDay();
+        const diff = date.getDate() - day + (day === 0 ? 6 : 5); // adjust when day is sunday
+        return new Date(date.setDate(diff));
+    };
+
     React.useEffect(() => {
         const fetchTimetable = async () => {
             try {
                 await untis.setUp();
 
                 const timegrid = untis.getFullUntisIdData().masterData.timeGrid;
-                setHolidays(untis.getFullUntisIdData().masterData.holidays);
+
+                timegrid.days = timegrid.days.filter((day: any) => day.day !== "SAT" && day.day !== "SUN");
 
                 timegrid.days.forEach((day: any) => {
-                    day.units.forEach((unit: any) => {
-                        unit.start = unit.startTime.slice(1);
-                        unit.end = unit.endTime.slice(1);
-                    });
-                });
-
-                timegrid.days = timegrid.days.filter((day: any) => {
-                    const isSaturday = day.day === "SAT";
-                    const hasClasses = getPeriodsAtWeekday(6).length > 0;
-                    return !isSaturday || hasClasses;
+                    day.units = day.units.reduce((mergedUnits: any[], unit: any) => {
+                        const lastUnit = mergedUnits[mergedUnits.length - 1];
+                        if (lastUnit && lastUnit.endTime === unit.startTime) {
+                            lastUnit.endTime = unit.endTime;
+                            lastUnit.isMerged = true;
+                        } else {
+                            mergedUnits.push(unit);
+                        }
+                        return mergedUnits;
+                    }, []);
                 });
 
                 setTimeGrid(timegrid);
 
-                const timetableData = await untis.getTimetable({
-                    id: 1,
-                    type: settings.store.UntisType as "STUDENT" | "CLASS" | "ROOM",
-                    startDate: getMonday(currentDate).toISOString().split("T")[0],
-                    endDate: getFriday(currentDate).toISOString().split("T")[0]
-                });
-                var temp: period[] = [];
-                if (settings.store.showonlyavailable) {
-                    timetableData.periods.forEach((element: period) => {
-                        if (element.is[0] === "REGULAR" || element.is[0] === "EXAM" || element.is[0] === "IRREGULAR") {
-                            temp.push(element);
-                        }
-                    });
-
-
-
-                }
-                else {
-                    temp = timetableData.periods;
-                }
-
-                setTimetable(temp);
             } catch (error) {
-                if (error instanceof Error) {
-                    setError(error.message);
-                    console.error(error);
-                } else {
-                    setError(String(error));
-                }
+                console.error("Error fetching timetable:", error);
             }
         };
 
         fetchTimetable();
-    }, [currentDate]);
+    }, [selectedDate]);
 
-    // Neuer useEffect-Hook zum Aktualisieren der Feiertage
+    const monday = getMonday(new Date(selectedDate));
+    const friday = getFriday(new Date(selectedDate));
+    const weekDates = Array.from({ length: 5 }, (_, i) => {
+        const date = new Date(monday);
+        date.setDate(monday.getDate() + i);
+        return date.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" });
+    });
+
+    // function to get the period by the start time Periods for start time: T16:30 on date: 31.03.2025 are: undefined
+    const getPeriodsByStartTime = (startTime: string, date: string) => {
+
+        if (!timeTable) {
+            console.error("No timetable data available");
+            return [];
+        }
+
+        const periods = timeTable?.periods.filter((period: any) => {
+            const periodStartTime = new Date(period.startDateTime).toISOString().split("T")[1].substring(0, 5);
+            const periodDate = new Date(period.startDateTime).toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" });
+
+            startTime = startTime.replace("T", "");
+
+            return periodStartTime === startTime && periodDate === date;
+        });
+
+        return periods;
+    };
+
     React.useEffect(() => {
-        const fetchHolidays = async () => {
+        const fetchTimetable = async () => {
             try {
                 await untis.setUp();
-                setHolidays(untis.getFullUntisIdData().masterData.holidays);
+
+                const timetableData = await untis.getTimetable({
+                    id: 1,
+                    type: settings.store.UntisType as "STUDENT" | "CLASS" | "ROOM",
+                    startDate: monday.toISOString().split("T")[0],
+                    endDate: friday.toISOString().split("T")[0]
+                });
+
+                /* displayableEndDate
+                :
+                "2025-04-04"
+                displayableStartDate
+                :
+                "2025-03-31"
+                periods
+                :
+                Array(30)
+                0
+                :
+                {id: 3953842, lessonId: 140775, startDateTime: '2025-03-31T09:15Z', endDateTime: '2025-03-31T10:00Z', foreColor: '#000000', …} */
+
+                // merge units
+                timetableData.periods = timetableData.periods.reduce((mergedPeriods: any[], period: any) => {
+                    const lastPeriod = mergedPeriods[mergedPeriods.length - 1];
+                    if (lastPeriod && lastPeriod.endDateTime === period.startDateTime) {
+                        lastPeriod.endDateTime = period.endDateTime;
+                        lastPeriod.isMerged = true;
+                    } else {
+                        mergedPeriods.push(period);
+                    }
+                    return mergedPeriods;
+                }, []);
+
+                console.log("Timetable data:", timetableData);
+
+                setTimeTable(timetableData);
+
             } catch (error) {
-                if (error instanceof Error) {
-                    setError(error.message);
-                    console.error(error);
-                } else {
-                    setError(String(error));
-                }
+                console.error("Error fetching timetable:", error);
             }
         };
 
-        fetchHolidays();
-    }, [currentDate]);
-
-
-    const handlePreviousWeek = () => {
-        setTimetable([]);
-        const newDate = new Date(currentDate);
-        newDate.setDate(newDate.getDate() - 7);
-        newDate.setHours(1, 0, 0, 0);
-        setCurrentDate(newDate);
-    };
-
-    const handleNextWeek = () => {
-        setTimetable([]);
-        const newDate = new Date(currentDate);
-        newDate.setDate(newDate.getDate() + 7);
-        newDate.setHours(1, 0, 0, 0);
-        setCurrentDate(newDate);
-    };
-
-    const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setTimetable([]);
-        const newDate = new Date(event.target.value);
-        newDate.setHours(1, 0, 0, 0);
-        setCurrentDate(newDate);
-    };
-
-    const getMonday = (date: Date) => {
-        const d = new Date(date);
-        const day = d.getDay();
-        const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-        return new Date(d.setDate(diff));
-    };
-
-    const getFriday = (date: Date) => {
-        const d = getMonday(date);
-        return new Date(d.setDate(d.getDate() + 4));
-    };
-
-    if (error) {
-        return (<ModalRoot {...rootProps}>
-            <div className="vc-untis-error">
-                <div>{error}</div>
-            </div>
-        </ModalRoot>);
-    }
-
-    if (!timeGrid || !timetable) {
-        return (<ModalRoot {...rootProps}>
-            <div className="vc-untis-loading">
-                <div>Loading...</div>
-            </div>
-        </ModalRoot>);
-    }
-
-    for (let i = 0; i < timeGrid.days.length; i++) {
-        const day = timeGrid.days[i];
-        const { units } = day;
-        for (let j = 0; j < units.length - 1; j++) {
-            const unit = units[j];
-            const nextUnit = units[j + 1];
-            if (unit.end === nextUnit.start) {
-                const periodsAtCurrentTime = getPeriodsAtWeekdayAndTime(i + 1, unit.start);
-                const periodsAtNextTime = getPeriodsAtWeekdayAndTime(i + 1, nextUnit.start);
-
-                const sameSubjectAndRoom = periodsAtCurrentTime.every((period: any) =>
-                    periodsAtNextTime.some((nextPeriod: any) =>
-                        period.subjects[0].id === nextPeriod.subjects[0].id &&
-                        period.rooms[0].id === nextPeriod.rooms[0].id &&
-                        period.teachers[0].id === nextPeriod.teachers[0].id &&
-                        period.classes[0].id === nextPeriod.classes[0].id
-                    )
-                );
-
-                if (sameSubjectAndRoom) {
-                    unit.end = nextUnit.end;
-                    units.splice(j + 1, 1);
-                    j--;
-                }
-            }
-        }
-    }
-
-    const timeSlots = Array.from(
-        new Set(
-            timeGrid.days.flatMap((day: any) => day.units.map((unit: any) => unit.start))
-        )
-    ).sort();
-
-    function getPeriodsAtWeekday(weekday: number) {
-        return timetable.filter((period: any) => {
-            const startDateTime = new Date(period.startDateTime);
-            return startDateTime.getDay() === weekday;
-        });
-    }
-
-    function getPeriodsAtWeekdayAndTime(weekday: number, time: string) {
-        return timetable.filter((period: any) => {
-            const startDateTime = new Date(period.startDateTime);
-            const isRightWeekday = startDateTime.getDay() === weekday;
-            const isBetweenStartAndEnd = period.startDateTime.split("T")[1].slice(0, 5) <= time && time < period.endDateTime.split("T")[1].slice(0, 5);
-            return isRightWeekday && isBetweenStartAndEnd;
-        });
-    }
-
-    function getHolidayByDateOfWeekWithWeekday(date: Date, weekday: number) {
-        const monday = getMonday(date);
-        const targetDate = new Date(monday);
-        targetDate.setDate(monday.getDate() + weekday - 1);
-
-        return holidays.find((holiday: any) => {
-            const start = new Date(holiday.startDate);
-            const end = new Date(holiday.endDate);
-            return start <= targetDate && targetDate <= end;
-        });
-    }
+        fetchTimetable();
+    }, [selectedDate]);
 
     return (
-        <ModalRoot className="vc-untis" {...rootProps}>
-            <div className="vc-untis-modal">
-                <div className="vc-untis-modal-content">
+        <ModalRoot {...rootProps} className="vc-untis-modal">
+            <nav>
+                <button className="vc-untis-modal-button" onClick={() => {
+                    const newDate = new Date(selectedDate);
+                    newDate.setDate(newDate.getDate() - 7);
+                    setSelectedDate(newDate.toISOString().split("T")[0]);
+                }}>
+                    Vorherige Woche
+                </button>
 
-                    {/* change weeks */}
-                    <div className="vc-untis-week">
-                        <div className="vc-untis-week-button" onClick={handlePreviousWeek}>{"←"}</div>
-                        <div className="vc-untis-week-text">
-                            <input type="date" value={currentDate.toISOString().split("T")[0]} onChange={handleDateChange} className="vc-untis-week-input" id="date" />
-                        </div>
-                        <div className="vc-untis-week-button" onClick={handleNextWeek}>{"→"}</div>
-                    </div>
+                <input type="date" className="vc-untis-modal-input" value={selectedDate} onChange={e => {
+                    const newDate = new Date(e.target.value);
+                    setSelectedDate(newDate.toISOString().split("T")[0]);
+                }} />
 
-                    <table className="vc-untis-timetable">
-                        <thead>
-                            <tr>
-                                <th>Time</th>
-                                {timeGrid.days.map((day: any, index: number) => {
-                                    const date = new Date(getMonday(currentDate));
-                                    date.setDate(date.getDate() + index);
-                                    return (
-                                        <th key={day.day}>{day.day} {date.getDate().toString().padStart(2, "0")}.{(date.getMonth() + 1).toString().padStart(2, "0")}</th>
-                                    );
-                                })}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {(timeSlots as string[]).map((timeSlot: string) => (
-                                <tr key={timeSlot as React.Key}>
-                                    <td>
-                                        <div>{`${String(timeSlot)} - ${timeGrid.days[0].units.find((unit: any) => unit.start === timeSlot)?.end || ""}`}</div>
-                                    </td>
-                                    {timeGrid.days.map((day: any, index: number) => (
-                                        <td key={index + 1} className={
-                                            `${new Date() > new Date(`${currentDate.toISOString().split("T")[0]}T${timeSlot}`) ? "PAST" : ""}
-                                            ${new Date() >= new Date(`${currentDate.toISOString().split("T")[0]}T${timeSlot}`) && new Date() < new Date(`${currentDate.toISOString().split("T")[0]}T${timeGrid.days[0].units.find((unit: any) => unit.start === timeSlot)?.end}`) ? "CURRENT" : ""}`
-                                        }>
-                                            <div className="vc-untis-periods">
-                                                {getPeriodsAtWeekdayAndTime(index + 1, timeSlot).map((period: any) => (
-                                                    <div key={period.id} style={{ color: period.subjects?.[0]?.backColor || "#f1f1f1" }} className={
-                                                        `vc-untis-period ${period.is[0]} ${period.homeWorks.filter((homework: any) => homework.endDate === period.startDateTime.split("T")[0]).length > 0 ? "HOMEWORK" : ""}
-                                                        ${period.exam ? "EXAM" : ""
-                                                        }`
-                                                    } onClick={() => openSingleLessonModal(period)}>
-                                                        <div>
-                                                            {period.subjects?.map((subject: any) => (
-                                                                <div key={subject.id} title={subject.longName}>{subject.name}</div>
-                                                            ))}
-                                                        </div>
-                                                        <div>
-                                                            {period.teachers?.map((teacher: any) => (
-                                                                <div key={teacher.id} title={teacher.longName}>{teacher.name}</div>
-                                                            ))}
-                                                        </div>
-                                                        <div>
-                                                            {period.rooms?.map((room: any) => (
-                                                                <div key={room.id} title={room.longName}>{room.name}</div>
-                                                            ))}
-                                                        </div>
-                                                        <div>
-                                                            {period.classes?.map((class_: any) => (
-                                                                <div key={class_.id} title={class_.longName}>{class_.name}</div>
-                                                            ))}
-                                                        </div>
+                <button className="vc-untis-modal-button" onClick={() => {
+                    const newDate = new Date();
+                    setSelectedDate(newDate.toISOString().split("T")[0]);
+                }}>
+                    Heute
+                </button>
+
+                <button className="vc-untis-modal-button" onClick={() => {
+                    const newDate = new Date(selectedDate);
+                    newDate.setDate(newDate.getDate() + 7);
+                    setSelectedDate(newDate.toISOString().split("T")[0]);
+                }}>
+                    Nächste Woche
+                </button>
+            </nav>
+            <table className="vc-untis-modal-grid">
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        {timeGrid && timeGrid.days.map((day: any, index: number) => (
+                            <th key={day.day}>
+                                {day.day} ({weekDates[index]})
+                            </th>
+                        ))}
+                    </tr>
+                </thead>
+                <tbody>
+                    {timeGrid && timeGrid.days.length > 0 && timeGrid.days[0].units.map((unit: any, index: number) => (
+                        <tr key={unit.start}>
+                            <td>{unit.startTime.replace(/^T/, "")} - {unit.endTime.replace(/^T/, "")}</td>
+                            {timeGrid.days.map((day: any, dayIndex: number) => {
+                                const dateForDay = weekDates[dayIndex]; // Datum für den aktuellen Tag
+                                const periods = getPeriodsByStartTime(unit.startTime, dateForDay); // Hole die Perioden für die Startzeit und das Datum
+
+                                return (
+                                    <td key={`${day.day}-${index}`}>
+                                        {periods && periods.length > 0 ? (
+                                            <div
+                                                className={`vc-untis-modal-periods ${new Date(periods[0].endDateTime) < new Date() ? "vc-untis-modal-periods-past" : ""}`}
+                                            >
+                                                {periods.map((period: any) => (
+                                                    <div key={period.id} className={`vc-untis-modal-period ${period.is}`}
+                                                        onClick={() => openSingleLessonModal(period)}>
+                                                        <p title={period.subjects.map((subject: any) => subject.longName || subject.name || "Unknown Subject").join(", ")}>
+                                                            {period.subjects.map((subject: any) => subject.name || "Unknown Subject").join(", ")}
+                                                        </p>
+                                                        <p title={period.rooms.map((room: any) => room.longName || room.name || "Unknown Room").join(", ")}>
+                                                            {period.rooms.map((room: any) => room.name || "Unknown Room").join(", ")}
+                                                        </p>
+                                                        <p title={period.teachers.map((teacher: any) => teacher.longName || teacher.name || "Unknown Teacher").join(", ")}>
+                                                            {period.teachers.map((teacher: any) => teacher.name || "Unknown Teacher").join(", ")}
+                                                        </p>
                                                     </div>
                                                 ))}
-
                                             </div>
-                                            {getHolidayByDateOfWeekWithWeekday(currentDate, index + 1) && (
-                                                <div className="vc-untis-holiday">
-                                                    <div>{getHolidayByDateOfWeekWithWeekday(currentDate, index + 1).longName}</div>
-                                                </div>
-                                            )}
-                                        </td>
-                                    ))}
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                                        ) : null}
+                                    </td>
+                                );
+                            })}
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
         </ModalRoot>
     );
 };
-
 
 const SingleLessonModalContent = ({ rootProps, period }: { rootProps: ModalProps; period: any; }) => {
     return (

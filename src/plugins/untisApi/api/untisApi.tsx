@@ -76,8 +76,6 @@ class WebUntisAPI {
 
         const now = Date.now() + 3600000; // Add 1 hour (3600000 milliseconds)
 
-        console.log(filtered);
-
         for (let i = 0; i < mergedPeriods.length; i++) {
             const period = mergedPeriods[i];
             const start = new Date(period.startDateTime).getTime();

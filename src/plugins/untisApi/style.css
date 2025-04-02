@@ -1,45 +1,14 @@
+/* stylelint-disable declaration-empty-line-before */
 /* stylelint-disable no-descending-specificity */
 /* stylelint-disable selector-class-pattern */
 /* stylelint-disable shorthand-property-no-redundant-values */
 /* stylelint-disable rule-empty-line-before */
-.vc-untis {
-    position: fixed;
-    z-index: 1000;
-    left: 40px;
-    top: 40px;
-    width: calc(100% - 80px);
-    height: calc(100% - 80px);
-    overflow: auto;
-    border-radius: 10px;
-    border: 1px solid #4d4d4d;
-    max-height: 100%;
-}
-
-.vc-untis::-webkit-scrollbar {
-    width: 0;
-}
-
-.vc-untis::-webkit-scrollbar-thumb {
-    background: var(--interactive-normal);
-    border-radius: 10px;
-}
-
-.vc-untis::-webkit-scrollbar-thumb:hover {
-    background: var(--interactive-active);
-}
-
-.vc-untis::-webkit-scrollbar-track {
-    background: var(--background-secondary);
-}
-
-.vc-untis::-webkit-scrollbar-button {
-    display: none;
-}
 
 /* Button Styles */
 .vc-untis-button {
     width: 100%;
     box-sizing: border-box;
+    border: none;
 }
 
 .vc-untis-button-content {
@@ -109,307 +78,141 @@
 }
 
 .vc-untis-modal {
-    height: 100%;
+    height: calc(100vh - 140px);
+    width: calc(100vw - 140px);
+    max-width: 100%;
+    max-height: 100%;
+    background: color-mix(in srgb, var(--background-primary), transparent 75%);
+    backdrop-filter: blur(10px);
+    border-radius: 25px !important;
+    overflow-y: scroll;
+    border: none !important;
+    padding: 20px;
+
+    /* Hide scrollbar */
+    scrollbar-width: none; /* For Firefox */
+    -ms-overflow-style: none; /* For Internet Explorer and Edge */
 }
 
-.vc-untis-modal-content {
-    height: 100%;
+.vc-untis-modal::-webkit-scrollbar {
+    display: none; /* For Chrome, Safari, and Opera */
 }
 
-/* Timetable Styles */
-.vc-untis-timetable {
+.vc-untis-modal-grid {
+    border-collapse: collapse;
     width: 100%;
     height: 100%;
     overflow: auto;
-    margin: 0;
-    padding: 0;
-    border-collapse: collapse;
-    table-layout: fixed;
-}
-
-.vc-untis-timetable thead {
     color: var(--text-normal);
-    border-bottom: 1px solid var(--background-tertiary);
-    font-weight: bold;
-    background: var(--background-tertiary);
-    position: sticky;
-    top: 0;
-    z-index: 1;
+    font-size: 18px;
+    font-family: sans-serif;
 }
 
-.vc-untis-timetable th,
-.vc-untis-timetable td {
+.vc-untis-modal-grid th {
+    background-color: color-mix(in srgb, var(--background-primary), transparent 50%);
+    border-radius: 25px !important;
+    box-shadow: 0 0 10px color-mix(in srgb, var(--background-primary), transparent 25%);
+    transform: scale(0.9);
+    padding: 10px;
     text-align: center;
     vertical-align: middle;
-    padding: 5px;
 }
 
-.vc-untis-timetable th:first-child {
-    width: 110px;
+/* first-column */
+.vc-untis-modal-grid th:first-child {
+    width: 100px;
 }
 
-.vc-untis-timetable td:first-child {
-    font-weight: bold;
-    background: var(--background-secondary);
+.vc-untis-modal-grid td:first-child {
+    background-color: color-mix(in srgb, var(--background-primary), transparent 75%);
+    border-radius: 25px !important;
+    box-shadow: 0 0 10px color-mix(in srgb, var(--background-primary), transparent 25%);
+    transform: scale(0.9);
+
+    vertical-align: middle;
+    text-align: center;
 }
 
-.vc-untis-timetable td:not(:first-child) {
-    background: var(--background-primary);
-    cursor: pointer;
-}
-
-.vc-untis-timetable tr {
-    color: var(--interactive-normal);
-    height: 35px;
-}
-
-.vc-untis-timetable tbody:not(:first-child) tr {
-    height: 110px;
-}
-
-.vc-untis-timetable td {
-    border: 1px solid var(--background-tertiary);
-    transition: background 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-.vc-untis-timetable td:hover {
-    background: var(--background-secondary);
-}
-
-/* Loading and Error Styles */
-.vc-untis-loading,
-.vc-untis-error {
+.vc-untis-modal nav {
     display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    font-size: 24px;
-    border-radius: 10px;
-    border: 1px solid #4d4d4d;
-}
-
-.vc-untis-loading {
-    color: var(--interactive-normal);
-}
-
-.vc-untis-error {
-    color: var(--error);
-}
-
-.vc-untis-periods {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    padding: 5px;
-}
-
-.vc-untis-period {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    width: 100%;
-}
-
-.vc-untis-period > div {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 3px;
-}
-
-
-.REGULAR::before {
-    content: '';
-    background-color: color-mix(in srgb, #0f4 15.3%, transparent);
-    color: white;
-    padding: 2px 5px;
-    border-radius: 5px;
-    font-size: 10px;
-    font-weight: bold;
-}
-
-.CANCELLED::before {
-    content: '';
-    background-color: color-mix(in srgb, rgb(255 0 17) 25.3%, transparent);
-    color: white;
-    padding: 2px 5px;
-    border-radius: 5px;
-    font-size: 10px;
-    font-weight: bold;
-}
-
-.IRREGULAR::before {
-    content: '';
-    background-color: color-mix(in srgb, #f90 25.3%, transparent);
-    color: white;
-    padding: 2px 5px;
-    border-radius: 5px;
-    font-size: 10px;
-    font-weight: bold;
-}
-
-.HOMEWORK {
-    position: relative;
-}
-
-.HOMEWORK::after {
-    content: '🏠︎';
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    font-size: 14px;
-    background: var(--background-secondary);
-    padding: 5px 8px;
-    border-radius: 5px;
-    font-weight: bold;
-}
-
-td.PAST {
-    background-color: color-mix(in srgb, var(--background-secondary) 50.3%, #030407) !important;
-    color: var(--text-secondary) !important;
-}
-
-td.PAST:hover {
-    background-color: color-mix(in srgb, var(--background-primary) 50.3%, #030407) !important;
-    color: var(--text-secondary) !important;
-}
-
-td.CURRENT {
-    background-color: color-mix(in srgb, var(--background-secondary) 90.9%, #0ba03380) !important;
-    color: var(--text-normal) !important;
-}
-
-td.CURRENT:hover {
-    background-color: color-mix(in srgb, var(--background-primary) 90.9%, #0ba03380) !important;
-    color: var(--text-normal) !important;
-}
-
-.vc-untis-week {
-    display: flex;
+    flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    background-color: var(--background-tertiary);
-    padding: 5px;
-}
-
-.vc-untis-week-button {
-    background-color: var(--background-secondary);
-    border-radius: 10px;
-    padding: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), width 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), padding 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    color: var(--text-normal);
-    font-weight: bold;
-    font-size: 18px;
-    width: 100px;
-    text-align: center;
-}
-
-.vc-untis-week-button:hover {
-    background-color: var(--background-primary);
-    width: 80px;
-}
-
-.vc-untis-week-button:first-child:hover {
-    padding-right: 25px;
-}
-
-.vc-untis-week-button:last-child:hover {
-    padding-left: 25px;
-}
-
-.vc-untis-week-button:active {
-    transform: translateY(1px);
-}
-
-.vc-untis-week-today {
-    background-color: var(--background-secondary);
-    border-radius: 10px;
-    padding: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), width 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), padding 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    color: var(--text-normal);
-    font-weight: bold;
-    font-size: 18px;
-    text-align: center;
-}
-
-.vc-untis-single-lesson {
-    background-color: var(--background-secondary);
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgb(0 0 0 / 10%);
-    color: var(--text-normal);
-    font-size: 16px;
-}
-
-.vc-untis-single-lesson h2 {
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 10px;
-    color: var(--text-normal);
-}
-
-.vc-untis-single-lesson p {
-    margin: 5px 0;
-    color: var(--text-secondary);
-}
-
-.vc-untis-single-lesson-homework {
-    margin-top: 20px;
-}
-
-.vc-untis-single-lesson-homework h3 {
-    font-size: 20px;
-    font-weight: bold;
-    margin-bottom: 10px;
-    color: var(--text-normal);
-}
-
-.vc-untis-single-lesson-homework div {
-    margin-top: 10px;
-    margin-left: 10px;
-}
-
-.vc-untis-holiday {
-    color: var(--text-normal);
-}
-
-.vc-untis-single-lesson-text {
-    margin-top: 20px;
-}
-
-.vc-untis-single-lesson-text h3 {
-    font-size: 20px;
-    font-weight: bold;
-    margin-bottom: 10px;
-    color: var(--text-normal);
-}
-
-.vc-untis-single-lesson-text p {
-    margin-left: 10px;
-}
-
-.vc-untis-week-text input {
     width: 100%;
-    padding: 5px;
-    border-radius: 10px;
-    border: 1px solid var(--background-tertiary);
+    height: 40px;
+    margin: 0 0 10px 0;
+    background-color: color-mix(in srgb, var(--background-primary), transparent 50%);
+    border-radius: 25px !important;
+    gap: 10px;
+}
+
+.vc-untis-modal-button,
+.vc-untis-modal-input {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background-color: transparent;
     color: var(--text-normal);
-    font-size: 16px;
-    margin-bottom: 10px;
-    background-color: var(--background-secondary);
-    font-weight: bold;
+    font-size: 18px;
+    font-family: sans-serif;
+    text-align: center;
+    transition: background-color 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), border-radius 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-.vc-untis-week-text input::placeholder {
-    color: var(--text-secondary);
+.vc-untis-modal-button:hover,
+.vc-untis-modal-input:hover {
+    background-color: color-mix(in srgb, var(--text-normal), transparent 95%);
+    border-radius: 25px !important;
+    box-shadow: 0 0 10px color-mix(in srgb, var(--text-normal), transparent 95%);
 }
 
-.untisActivitySettings img {
-    width: 70px;
-    height: 70px;
-    margin-right: 10px;
+.vc-untis-modal-periods {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+.vc-untis-modal-periods div {
+    width: 100%;
+    height: 100%;
+    border: none;
+    color: var(--text-normal);
+    font-size: 18px;
+    font-family: sans-serif;
+    text-align: center;
+    background-color: color-mix(in srgb, var(--background-primary), transparent 70%);
+    scale: 0.9;
+    border-radius: 25px !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    transition: background-color 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), scale 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.vc-untis-modal-periods div:hover {
+    scale: 1;
+    background-color: color-mix(in srgb, var(--text-normal), transparent 95%);
+    opacity: 1;
+    cursor: pointer;
+}
+
+.vc-untis-modal-periods-past div {
+    opacity: 0.4;
+}
+
+.vc-untis-modal-period.CANCELLED {
+    background-color: color-mix(in srgb, color-mix(in srgb, var(--background-primary), transparent 50%), red 4%);
+    color: var(--text-normal);
+    text-decoration: line-through;
+}
+
+.vc-untis-modal-period.IRREGULAR {
+    background-color: color-mix(in srgb, color-mix(in srgb, var(--background-primary), transparent 50%), yellow 4%);
+    color: var(--text-normal);
+    text-decoration: underline;
 }

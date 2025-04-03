@@ -206,13 +206,13 @@
 }
 
 .vc-untis-modal-period.CANCELLED {
-    background-color: color-mix(in srgb, color-mix(in srgb, var(--background-primary), transparent 50%), red 4%);
+    background-color: color-mix(in srgb, color-mix(in srgb, var(--background-primary), transparent 50%), red 10%);
     color: var(--text-normal);
     text-decoration: line-through;
 }
 
 .vc-untis-modal-period.IRREGULAR {
-    background-color: color-mix(in srgb, color-mix(in srgb, var(--background-primary), transparent 50%), yellow 4%);
+    background-color: color-mix(in srgb, color-mix(in srgb, var(--background-primary), transparent 50%), yellow 10%);
     color: var(--text-normal);
     text-decoration: underline;
 }
@@ -231,10 +231,10 @@
 }
 
 .vc-untis-single-lesson-modal.CANCELLED {
-    background-color: color-mix(in srgb, color-mix(in srgb, var(--background-primary), transparent 50%), red 4%);
+    background-color: color-mix(in srgb, color-mix(in srgb, var(--background-primary), transparent 50%), red 7%);
 }
 .vc-untis-single-lesson-modal.IRREGULAR {
-    background-color: color-mix(in srgb, color-mix(in srgb, var(--background-primary), transparent 50%), yellow 4%);
+    background-color: color-mix(in srgb, color-mix(in srgb, var(--background-primary), transparent 50%), yellow 7%);
 }
 
 .vc-untis-single-lesson-modal h2 {

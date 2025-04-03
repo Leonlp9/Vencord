@@ -470,10 +470,20 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
                                     <td key={`${day.day}-${index}`}>
                                         {periods && periods.length > 0 ? (
                                             <div
-                                                className={`vc-untis-modal-periods ${new Date(periods[0].endDateTime) < new Date() ? "vc-untis-modal-periods-past" : ""}`}
+                                                className={`vc-untis-modal-periods ${new Date(periods[0].endDateTime).getTime() - 1000 * 60 * 60 * 2 < Date.now()
+                                                    ? "vc-untis-modal-periods-past"
+                                                    : new Date(periods[0].startDateTime).getTime() - 1000 * 60 * 60 * 2 <= Date.now() &&
+                                                        new Date(periods[0].endDateTime).getTime() - 1000 * 60 * 60 * 2 > Date.now()
+                                                        ? "vc-untis-modal-periods-current"
+                                                        : ""
+                                                    }`}
                                             >
                                                 {periods.map((period: any) => (
                                                     <div key={period.id} className={`vc-untis-modal-period ${period.is}`}
+                                                        style={{
+                                                            backgroundColor: `color-mix(in srgb, ${period.subjects?.[0]?.backColor || period.backColor || "transparent"} 40%, transparent)`,
+                                                            color: period.subjects?.[0]?.foreColor || period.foreColor || undefined
+                                                        }}
                                                         onClick={() => openSingleLessonModal(period)}>
                                                         <p title={period.subjects.map((subject: any) => subject.longName || subject.name || "Unknown Subject").join(", ")}>
                                                             {period.subjects.map((subject: any) => subject.name || "Unknown Subject").join(", ")}

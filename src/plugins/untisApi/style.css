@@ -111,7 +111,6 @@
 .vc-untis-modal-grid th {
     background-color: color-mix(in srgb, var(--background-primary), transparent 50%);
     border-radius: 25px !important;
-    box-shadow: 0 0 10px color-mix(in srgb, var(--background-primary), transparent 25%);
     transform: scale(0.9);
     padding: 10px;
     text-align: center;
@@ -126,7 +125,6 @@
 .vc-untis-modal-grid td:first-child {
     background-color: color-mix(in srgb, var(--background-primary), transparent 75%);
     border-radius: 25px !important;
-    box-shadow: 0 0 10px color-mix(in srgb, var(--background-primary), transparent 25%);
     transform: scale(0.9);
 
     vertical-align: middle;
@@ -202,21 +200,41 @@
 }
 
 .vc-untis-modal-periods-past div {
-    opacity: 0.4;
+    opacity: 0.3;
 }
 
-.vc-untis-modal-period.CANCELLED {
-    background-color: color-mix(in srgb, color-mix(in srgb, var(--background-primary), transparent 50%), red 10%);
-    color: var(--text-normal);
-    text-decoration: line-through;
+.vc-untis-modal-periods-current div {
+    animation: current 1s infinite cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    opacity: 1;
 }
 
-.vc-untis-modal-period.IRREGULAR {
-    background-color: color-mix(in srgb, color-mix(in srgb, var(--background-primary), transparent 50%), yellow 10%);
-    color: var(--text-normal);
-    text-decoration: underline;
+@keyframes current {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
 }
 
+.vc-untis-modal-period.CANCELLED p:not(:empty) {
+    background-color: color-mix(in srgb, color-mix(in srgb, var(--background-primary), transparent 50%), rgba(255, 0, 0, 0.518) 50%);
+    border-radius: 25px !important;
+    transform: scale(0.9);
+    padding: 10px;
+    margin: 0;
+}
+
+.vc-untis-modal-period.IRREGULAR p:not(:empty) {
+    background-color: color-mix(in srgb, color-mix(in srgb, var(--background-primary), transparent 50%), rgba(0, 255, 0, 0.559) 50%);
+    border-radius: 25px !important;
+    transform: scale(0.9);
+    padding: 10px;
+    margin: 0;
+}
 
 .vc-untis-single-lesson-modal {
     background-color: color-mix(in srgb, var(--background-primary), transparent 50%);

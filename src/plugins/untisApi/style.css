@@ -204,19 +204,53 @@
 }
 
 .vc-untis-modal-periods-current div {
-    animation: current 1s infinite cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    opacity: 1;
+    animation: gradientMove 20s infinite linear;
+    opacity: 0.7;
+    background: linear-gradient(90deg,
+        rgba(255, 0, 0, 0.7),
+        rgba(255, 165, 0, 0.7),
+        rgba(255, 255, 0, 0.7),
+        rgba(0, 255, 0, 0.7),
+        rgba(0, 255, 255, 0.7),
+        rgba(0, 0, 255, 0.7),
+        rgba(128, 0, 128, 0.7),
+        rgba(255, 0, 0, 0.7));
+    background-size: 400% 100%;
+
+
+}
+.vc-untis-modal-periods-current div::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -4px;
+    right: -4px;
+    bottom: -5px;
+    border: 4px solid blue;
+    border-radius: 30px; /* Match the border radius of the parent if any */
+    animation: scaleOutline 2s infinite ease-in-out;
+    pointer-events: none; /* Ensure it doesn’t interfere with clicks */
+
 }
 
-@keyframes current {
+@keyframes scaleOutline {
     0% {
-        transform: scale(1);
+        transform: scale(1.02);
     }
     50% {
-        transform: scale(1.05);
+        transform: scale(1.03); /* Slightly larger outline */
     }
     100% {
-        transform: scale(1);
+        transform: scale(1.02);
+    }
+}
+
+@keyframes gradientMove {
+    0% {
+        background-position: 0% 50%;
+    }
+    100% {
+        background-position: 400% 50%;
     }
 }
 

@@ -19,6 +19,7 @@ export default definePlugin({
             openNewPluginsModal();
         }
     },
+    enabledByDefault: true,
     openNewPluginsModal,
     KNOWN_PLUGINS_DATA_KEY
 });

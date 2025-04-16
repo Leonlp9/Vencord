@@ -21,7 +21,7 @@ import "./style.css";
 import { findGroupChildrenByChildId, NavContextMenuPatchCallback } from "@api/ContextMenu";
 import { addMessageAccessory, removeMessageAccessory } from "@api/MessageAccessories";
 import { addMessagePopoverButton, removeMessagePopoverButton } from "@api/MessagePopover";
-import { Devs, EquicordDevs } from "@utils/constants";
+import { Devs, Devs } from "@utils/constants";
 import definePlugin from "@utils/types";
 import { ChannelStore, Menu } from "@webpack/common";
 
@@ -49,7 +49,7 @@ export default definePlugin({
     name: "Translate+",
     description: "Vencord's translate plugin but with support for artistic languages!",
     dependencies: ["MessageAccessoriesAPI"],
-    authors: [Devs.Ven, EquicordDevs.Prince527],
+    authors: [Devs.Ven, Devs.Prince527],
     settings,
     contextMenus: {
         "message": messageCtxPatch

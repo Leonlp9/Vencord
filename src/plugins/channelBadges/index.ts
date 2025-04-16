@@ -6,7 +6,7 @@
 
 import "./style.css";
 
-import { EquicordDevs } from "@utils/constants";
+import { Devs } from "@utils/constants";
 import { getCurrentGuild } from "@utils/discord";
 import definePlugin from "@utils/types";
 import { ChannelStore, SelectedGuildStore } from "@webpack/common";
@@ -119,7 +119,7 @@ function onGuildChange() {
 export default definePlugin({
     name: "ChannelBadges",
     description: "Adds badges to channels based on their type",
-    authors: [EquicordDevs.creations],
+    authors: [Devs.creations],
     settings,
 
     async start() {

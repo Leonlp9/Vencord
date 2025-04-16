@@ -22,7 +22,7 @@ import { NavContextMenuPatchCallback } from "@api/ContextMenu";
 import { DataStore } from "@api/index";
 import { addMessagePopoverButton, removeMessagePopoverButton } from "@api/MessagePopover";
 import ErrorBoundary from "@components/ErrorBoundary";
-import { EquicordDevs } from "@utils/constants";
+import { Devs } from "@utils/constants";
 import { classes } from "@utils/misc";
 import { openModal } from "@utils/modal";
 import definePlugin from "@utils/types";
@@ -72,7 +72,7 @@ function ToolBarHeader() {
 export default definePlugin({
     name: "HolyNotes",
     description: "Holy Notes allows you to save messages",
-    authors: [EquicordDevs.Wolfie],
+    authors: [Devs.Wolfie],
     dependencies: ["MessagePopoverAPI", "ChatInputButtonAPI"],
 
     patches: [

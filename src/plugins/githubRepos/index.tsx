@@ -8,7 +8,7 @@ import "./styles.css";
 
 import { definePluginSettings } from "@api/Settings";
 import ErrorBoundary from "@components/ErrorBoundary";
-import { EquicordDevs } from "@utils/constants";
+import { Devs } from "@utils/constants";
 import { Logger } from "@utils/Logger";
 import definePlugin, { OptionType } from "@utils/types";
 import { findByCodeLazy } from "@webpack";
@@ -64,7 +64,7 @@ const ProfilePopoutComponent = ErrorBoundary.wrap(
 export default definePlugin({
     name: "GitHubRepos",
     description: "Displays a user's public GitHub repositories in their profile",
-    authors: [EquicordDevs.talhakf, EquicordDevs.Panniku],
+    authors: [Devs.talhakf, Devs.Panniku],
     settings,
 
     patches: [

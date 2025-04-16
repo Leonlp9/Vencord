@@ -10,7 +10,7 @@ import { findGroupChildrenByChildId, NavContextMenuPatchCallback } from "@api/Co
 import { DataStore } from "@api/index";
 import { definePluginSettings } from "@api/Settings";
 import { Flex } from "@components/Flex";
-import { Devs, EquicordDevs } from "@utils/constants";
+import { Devs, Devs } from "@utils/constants";
 import { ModalContent, ModalFooter, ModalHeader, ModalRoot, ModalSize, openModal } from "@utils/modal";
 import definePlugin, { OptionType } from "@utils/types";
 import { Alerts, Button, Clipboard, ContextMenuApi, FluxDispatcher, Forms, Menu, React, showToast, TextInput, Toasts, useCallback, useState } from "@webpack/common";
@@ -277,7 +277,7 @@ export const settings = definePluginSettings({
 export default definePlugin({
     name: "GifCollections",
     description: "Allows you to create collections of gifs",
-    authors: [Devs.Aria, EquicordDevs.creations],
+    authors: [Devs.Aria, Devs.creations],
     patches: [
         {
             find: "renderCategoryExtras",

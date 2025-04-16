@@ -8,7 +8,7 @@ import { findGroupChildrenByChildId, NavContextMenuPatchCallback } from "@api/Co
 import { definePluginSettings } from "@api/Settings";
 import { disableStyle, enableStyle } from "@api/Styles";
 import { PaintbrushIcon } from "@components/Icons";
-import { EquicordDevs } from "@utils/constants";
+import { Devs } from "@utils/constants";
 import { getCurrentChannel } from "@utils/discord";
 import { closeModal, openModal } from "@utils/modal";
 import definePlugin, { OptionType } from "@utils/types";
@@ -111,7 +111,7 @@ const settings = definePluginSettings({
 export default definePlugin({
     name: "Remix",
     description: "Adds Remix to Desktop",
-    authors: [EquicordDevs.MrDiamond],
+    authors: [Devs.MrDiamond],
     settings,
     contextMenus: {
         "channel-attach": UploadContextMenuPatch,

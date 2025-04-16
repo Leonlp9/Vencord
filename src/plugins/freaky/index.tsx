@@ -5,7 +5,7 @@
  */
 
 import { ApplicationCommandInputType, ApplicationCommandOptionType, findOption } from "@api/Commands";
-import { EquicordDevs } from "@utils/constants";
+import { Devs } from "@utils/constants";
 import { sendMessage } from "@utils/discord";
 import definePlugin from "@utils/types";
 
@@ -30,7 +30,7 @@ function makeFreaky(text: string) {
 export default definePlugin({
     name: "Freaky",
     description: "freaky.",
-    authors: [EquicordDevs.nyx],
+    authors: [Devs.nyx],
     commands: [
         {
             name: "freaky",

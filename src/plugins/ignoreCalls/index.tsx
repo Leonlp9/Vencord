@@ -7,7 +7,7 @@
 import { NavContextMenuPatchCallback } from "@api/ContextMenu";
 import { definePluginSettings } from "@api/Settings";
 import { ErrorBoundary } from "@components/index";
-import { EquicordDevs } from "@utils/constants";
+import { Devs } from "@utils/constants";
 import definePlugin, { OptionType } from "@utils/types";
 import { FluxDispatcher, Menu, React, UserStore } from "@webpack/common";
 import { Channel } from "discord-types/general";
@@ -52,7 +52,7 @@ const settings = definePluginSettings({
 export default definePlugin({
     name: "IgnoreCalls",
     description: "Allows you to ignore calls from specific users or dm groups.",
-    authors: [EquicordDevs.TheArmagan],
+    authors: [Devs.TheArmagan],
     patches: [
         {
             find: "#{intl::INCOMING_CALL_ELLIPSIS}",

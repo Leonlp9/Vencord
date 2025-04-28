@@ -613,6 +613,298 @@ export const Devs = /* #__PURE__*/ Object.freeze({
         name: "samsam",
         id: 836452332387565589n,
     },
+    nobody: {
+        name: "nobody",
+        id: 0n
+    },
+    thororen: {
+        name: "thororen",
+        id: 848339671629299742n
+    },
+    Cortex: {
+        name: "Cortex",
+        id: 400111022901559298n
+    },
+    KrystalSkull: {
+        name: "krystalskullofficial",
+        id: 929208515883569182n
+    },
+    Naibuu: {
+        name: "hs50",
+        id: 1120045713867423835n
+    },
+    nexpid: {
+        name: "Nexpid",
+        id: 853550207039832084n
+    },
+    FoxStorm1: {
+        name: "FoxStorm1",
+        id: 789872551731527690n
+    },
+    camila314: {
+        name: "camila314",
+        id: 738592270617542716n
+    },
+    Wolfie: {
+        name: "wolfieeeeeeee",
+        id: 347096063569559553n
+    },
+    ryan: {
+        name: "ryan",
+        id: 479403382994632704n
+    },
+    MrDiamond: {
+        name: "MrDiamond",
+        id: 523338295644782592n
+    },
+    Fres: {
+        name: "fres",
+        id: 843448897737064448n
+    },
+    Dams: {
+        name: "Dams",
+        id: 769939285792653325n
+    },
+    KawaiianPizza: {
+        name: "KawaiianPizza",
+        id: 501000986735673347n
+    },
+    Perny: {
+        name: "Perny",
+        id: 1101508982570504244n
+    },
+    Jaxx: {
+        name: "Jaxx",
+        id: 901016640253227059n
+    },
+    Balaclava: {
+        name: "Balaclava",
+        id: 854886148455399436n
+    },
+    dat_insanity: {
+        name: "dat_insanity",
+        id: 0n
+    },
+    coolesding: {
+        name: "cooles",
+        id: 406084422308331522n
+    },
+    MaxHerbold: {
+        name: "MaxHerbold",
+        id: 1189527130611138663n
+    },
+    Combatmaster: {
+        name: "Combatmaster331",
+        id: 790562534503612437n
+    },
+    Megal: {
+        name: "Megal",
+        id: 387790666484285441n
+    },
+    Woosh: {
+        name: "w00shh.",
+        id: 919239894327521361n
+    },
+    Hanzy: {
+        name: "hanzydev",
+        id: 1093131781043126322n
+    },
+    zoodogood: {
+        name: "zoodogood",
+        id: 921403577539387454n
+    },
+    Drag: {
+        name: "dragalt_",
+        id: 1189903210564038697n
+    },
+    bhop: {
+        name: "femeie",
+        id: 442626774841556992n
+    },
+    Panniku: {
+        name: "Panniku",
+        id: 703634705152606318n
+    },
+    Tolgchu: {
+        name: "✨Tolgchu✨",
+        id: 329671025312923648n
+    },
+    DaBluLite: {
+        name: "DaBluLite",
+        id: 582170007505731594n
+    },
+    kvba: {
+        name: "kvba",
+        id: 105170831130234880n
+    },
+    Fafa: {
+        name: "Fafa",
+        id: 428188716641812481n
+    },
+    Colorman: {
+        name: "colorman",
+        id: 298842558610800650n
+    },
+    walrus: {
+        name: "walrus",
+        id: 305317288775778306n
+    },
+    Prince527: {
+        name: "Prince527",
+        id: 364105797162237952n
+    },
+    ThePirateStoner: {
+        name: "ThePirateStoner",
+        id: 1196220620376121381n
+    },
+    Sampath: {
+        name: "Sampath",
+        id: 984015688807100419n
+    },
+    catcraft: {
+        name: "catcraft",
+        id: 290162449213292546n
+    },
+    ShadyGoat: {
+        name: "Shady Goat",
+        id: 376079696489742338n
+    },
+    SimplyData: {
+        name: "SimplyData",
+        id: 301494563514613762n
+    },
+    keifufu: {
+        name: "keifufu",
+        id: 469588398110146590n
+    },
+    Blackilykat: {
+        name: "Blackilykat",
+        id: 442033332952498177n
+    },
+    x3rt: {
+        name: "x3rt",
+        id: 131602100332396544n
+    },
+    Hen: {
+        name: "Hen",
+        id: 279266228151779329n
+    },
+    Crxa: {
+        name: "Crxa",
+        id: 376637472588824587n
+    },
+    vmohammad: {
+        name: "vMohammad",
+        id: 921098159348924457n
+    },
+    SpikeHD: {
+        name: "SpikeHD",
+        id: 221757857836564485n
+    },
+    bep: {
+        name: "bep",
+        id: 0n
+    },
+    llytz: {
+        name: "llytz",
+        id: 1271128098301022240n
+    },
+    iamme: {
+        name: "i am me",
+        id: 984392761929256980n
+    },
+    creations: {
+        name: "Creation's",
+        id: 209830981060788225n
+    },
+    Leko: {
+        name: "Leko",
+        id: 108153734541942784n
+    },
+    nvhhr: {
+        name: "nvhhr",
+        id: 165098921071345666n
+    },
+    Z1xus: {
+        name: "Z1xus",
+        id: 377450600797044746n
+    },
+    Oggetto: {
+        name: "Oggetto",
+        id: 619203349954166804n
+    },
+    zyqunix: {
+        name: "zyqunix",
+        id: 1201415921802170388n
+    },
+    examplegit: {
+        name: "example.user",
+        id: 175411535357673473n
+    },
+    Loukios: {
+        name: "Loukios",
+        id: 211461918127292416n
+    },
+    vappstar: {
+        name: "vappstar",
+        id: 747192967311261748n
+    },
+    voidbbg: {
+        name: "voidbbg",
+        id: 117126234588184582n
+    },
+    OIRNOIR: {
+        name: "OIRNOIR",
+        id: 720842469024989195n
+    },
+    mochienya: {
+        name: "mochie",
+        id: 1043599230247374869n,
+    },
+    okiso: {
+        name: "okiso",
+        id: 274178934143451137n,
+    },
+    port22exposed: {
+        name: "port",
+        id: 1318383159645311009n,
+    },
+    PhoenixAceVFX: {
+        name: "PhoenixAceVFX",
+        id: 1016895892055396484n,
+    },
+    TheArmagan: {
+        name: "TheArmagan",
+        id: 707309693449535599n
+    },
+    seth: {
+        name: "S€th",
+        id: 1273447359417942128n
+    },
+    SteelTech: {
+        name: "SteelTech",
+        id: 1344190786476183643n
+    },
+    talhakf: {
+        name: "talhakf",
+        id: 1140716160560676976n
+    },
+    xijexo: {
+        name: "xijexo",
+        id: 1284113557201620995n
+    },
+    omaw: {
+        name: "omaw",
+        id: 1155026301791514655n
+    },
+    WKoA: {
+        name: "WKoA",
+        id: 724416180097384498n
+    },
+    smuki: {
+        name: "smuki",
+        id: 691517398523576331n
+    },
 } satisfies Record<string, Dev>);
 
 // iife so #__PURE__ works correctly
@@ -623,3 +915,4 @@ export const DevsById = /* #__PURE__*/ (() =>
             .map(([_, v]) => [v.id, v] as const)
     ))
 )() as Record<string, Dev>;
+

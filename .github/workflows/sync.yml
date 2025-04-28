@@ -1,52 +1,23 @@
 name: Sync Fork
 
 on:
+  workflow_dispatch:
   schedule:
-    - cron: '0 0 * * *'  # Einmal täglich um Mitternacht ausführen
-  workflow_dispatch:  # Manuelles Starten ermöglichen
+    - cron: "0 0 * * *"
 
 jobs:
   sync:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout Fork
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v2
+
+      - name: Sync and merge upstream repository with your current repository
+        uses: dabreadman/sync-upstream-repo@v1.3.0
         with:
-          persist-credentials: false
-
-      - name: Set Git User
-        run: |
-          git config --global user.email "leon.marcel.rabe@gmail.com"
-          git config --global user.name "Leon Rabe"
-
-      - name: Add Upstream Remote
-        run: git remote add upstream https://github.com/Vendicated/Vencord.git
-
-      - name: Fetch Upstream Changes
-        run: git fetch upstream
-
-      - name: Create New Branch
-        run: |
-          git checkout -b sync-upstream
-
-      - name: Merge Upstream Changes
-        run: git merge upstream/main --allow-unrelated-histories || true
-
-      - name: Push Changes
-        run: git push https://${{ secrets.PAT_TOKEN }}@github.com/Leonlp9/Vencord.git sync-upstream
-
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v4
-        with:
-          token: ${{ secrets.PAT_TOKEN }}
-          branch: sync-upstream
-          title: 'Sync Upstream Changes'
-          body: 'This PR merges changes from the upstream repository into the main branch.'
-          labels: 'sync'
-
-      - name: Auto Merge Pull Request
-        uses: "peter-evans/enable-pull-request-automerge@v2"
-        with:
-          token: ${{ secrets.PAT_TOKEN }}
-          pull-request-number: ${{ steps.create-pull-request.outputs.pull-request-number }}
-          merge-method: squash
+          # URL of gitHub public upstream repo
+          upstream_repo: https://github.com/
+          # GitHub Bot token
+          token: ${{ secrets.GITHUB_TOKEN }}
+          
+      

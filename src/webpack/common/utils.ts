@@ -208,3 +208,26 @@ export const DateUtils: t.DateUtils = mapMangledModuleLazy("millisecondsInUnit:"
     isSameDay: filters.byCode("Math.abs(+"),
     diffAsUnits: filters.byCode("days:0", "millisecondsInUnit")
 });
+
+/**
+ * Clipboard utility for copying text to clipboard.
+ */
+export const Clipboard = {
+    copy(text: string) {
+        if (navigator?.clipboard?.writeText) {
+            navigator.clipboard.writeText(text);
+        } else {
+            // Fallback for environments without navigator.clipboard
+            const textarea = document.createElement("textarea");
+            textarea.value = text;
+            textarea.style.position = "fixed";
+            document.body.appendChild(textarea);
+            textarea.focus();
+            textarea.select();
+            try {
+                document.execCommand("copy");
+            } catch { }
+            document.body.removeChild(textarea);
+        }
+    }
+};
